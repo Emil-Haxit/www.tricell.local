@@ -1,0 +1,51 @@
+style.
+  .form-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+    gap: 12px;
+  }
+
+  .form-group label {
+    width: 220px;
+    font-weight: 600;
+  }
+
+  .form-group input,
+  .form-group textarea {
+    flex: 1;
+  }
+
+form.add-new-research-object(
+  action=`http://localhost:3000/api/editvirus/${virusid}`
+  method="POST"
+  enctype="multipart/form-data"
+  onsubmit="return virusForm()"
+)
+  .form-group
+    label(for="number") Number
+    input#number(type="text" name="number" value=number)
+
+  .form-group
+    label(for="name") Name
+    input#name(type="text" name="name" value=name)
+
+  .form-group
+    label(for="text") Text
+    textarea#text(name="text")= text
+
+  .form-group
+    label(for="securityDataSheet") Security DataSheet
+    input#securityDataSheet(type="file" name="securityDataSheet" value=securityDataSheet)
+
+  .form-group
+    label(for="securityPresentationVideo") Security Presentation Video (YouTube link)
+    input#securityPresentationVideo(type="text" name="securityPresentationVideo" value=securityPresentationVideo)
+
+  .form-group
+    label(for="securityHandlingVideo") Security Handling Video (YouTube link)
+    input#securityHandlingVideo(type="text" name="securityHandlingVideo" value=securityHandlingVideo)
+
+  button(type="submit") Save
+
+script(src="/scripts/virusform.js")
