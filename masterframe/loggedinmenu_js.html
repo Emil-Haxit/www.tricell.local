@@ -1,0 +1,94 @@
+
+    <script language="JavaScript">
+    function showCalcLayer()
+    {
+        if(document.getElementById('calcLayer').style.display=='block')
+        {
+            document.getElementById('calcLayer').style.display='none';
+        }
+        else
+        {
+            document.getElementById('calcLayer').style.display='block';
+        }
+    }
+    </script>
+    
+    <script language="JavaScript">
+    function resetDisplay()
+    {
+        document.calc.display.value = "";
+    }
+    function updateDisplay(invalue)
+    {
+        document.calc.display.value = document.calc.display.value + invalue;
+    }
+    function calculate()
+    {
+        document.calc.display.value = eval(document.calc.display.value);
+    }
+    </script>
+    
+    <script language="JavaScript">
+    function refreshChat()
+    {
+    const xhttp2 = new XMLHttpRequest();
+    xhttp2.onload = function() 
+    {
+       document.getElementById("chatLayerMessages").innerHTML = this.responseText;
+        var elem = document.getElementById('chatLayer');
+        elem.scrollTop = elem.scrollHeight;
+    }
+    xhttp2.open("GET","http://localhost:3000/api/chat",true);
+    xhttp2.send()
+    }
+
+    function showChatLayer()
+    {
+        if(document.getElementById('chatLayer').style.display=='block')
+        {
+            document.getElementById('chatLayer').style.display='none';
+        }
+        else
+        {
+            document.getElementById('chatLayer').style.display='block';
+            refreshChat();
+            setInterval(function() 
+	        {
+                refreshChat();
+            }, 5000); //5 seconds
+        }
+    }
+
+    function submitChat()
+    {
+
+        var http = new XMLHttpRequest();
+        http.open("POST", "http://localhost:3000/api/chat", true);
+        http.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+        var params = "MAX_FILE_SIZE=50000000&chatmessage=" + document.getElementById('chatmessage').value;
+        http.send(params);
+
+        http.onload = function() 
+        {
+            document.getElementById("chatmessage").value = this.responseText;
+        }
+
+    }
+    </script>
+    
+    <script language="JavaScript">
+    function loadChat()
+    {
+        const xhttp = new XMLHttpRequest();
+        setInterval(function() 
+	    {
+           xhttp.onload = function() 
+           {
+	            document.getElementById("chatnumber").innerHTML = this.responseText;
+           }
+           xhttp.open("GET","http://localhost:3000/api/getchat",true);
+           xhttp.send();
+
+        }, 3000); //3 seconds
+    }
+    </script>
