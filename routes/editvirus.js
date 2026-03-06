@@ -160,14 +160,6 @@ router.get('/:id', (request, response) => {
         response.write(htmlInfoStart);
 
         if (request.session.loggedin) {
-            const filePath = path.resolve(__dirname, "../data/safetydatasheets/" + str_objectNumber + ".pdf");
-
-            var virusFileName = "";
-            var virusLastModified = "";
-            var virusFileSizeKB = "";
-
-
-
 
             htmlNewEmployeeCSS = readHTML('./masterframe/newemployee_css.html');
             response.write(htmlNewEmployeeCSS);
