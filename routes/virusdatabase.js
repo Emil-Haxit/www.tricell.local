@@ -56,7 +56,9 @@ router.get('/', (request, response) => {
             htmlOutput += "<tr><td width=\"350\" align=\"left\">";
             htmlOutput += "<h2>Personnel Registry:</h2>\n";
             htmlOutput += "</td><td width=\"350\" align=\"right\">";
-            htmlOutput += "<a href=\"http://localhost:3000/api/newvirus\" style=\"color:#336699;text-decoration:none;\">Add Research Object</a>";
+            if (request.session.securityAccessLevel == "A" || request.session.securityAccessLevel == "B") {
+                htmlOutput += "<a href=\"http://localhost:3000/api/newvirus\" style=\"color:#336699;text-decoration:none;\">Add Research Object</a>";
+            }
             htmlOutput += "</td></tr></table>";
 
             htmlOutput += "<div id=\"table-resp\">" +
@@ -67,7 +69,7 @@ router.get('/', (request, response) => {
                 "<div class=\"table-header-cell-light\">By</div>\n" +
                 "<div class=\"table-header-cell-light\">Entries</div>\n" +
                 "<div class=\"table-header-cell-light\">Last entry</div>\n";
-            if (request.session.loggedin) {
+            if (request.session.securityAccessLevel == "A" || request.session.securityAccessLevel == "B") {
                 htmlOutput += "<div class=\"table-header-cell-light\">Edit</div>\n" +
                     "<div class=\"table-header-cell-light\">Delete</div>\n";
             }
@@ -75,53 +77,71 @@ router.get('/', (request, response) => {
                 "<div id=\"table-body\">\n";
             "";
 
-            // Skicka SQL-query till databasen och läs in variabler
-            const result = await connection.query('SELECT ID, objectNumber, objectName, objectCreator, objectCreatedDate FROM ResearchObjects');
+            // Hämta alla objekt + deras entries i EN query
+            const rows = await connection.query(`
+    SELECT 
+        ro.ID,
+        ro.objectNumber,
+        ro.objectName,
+        ro.objectCreator,
+        ro.objectCreatedDate,
+        re.entryDate
+    FROM ResearchObjects ro
+    LEFT JOIN ResearchEntries re
+        ON ro.ID = re.researchObjectID
+`);
 
-            // Ta reda på antalet employees
-            var count = result.length;
+            // Gruppera entries per objekt
+            const objects = {};
 
-            // Loopa genom och skriv ut varje person
-            let i;
-            for (i = 0; i < count; i++) {
+            for (const row of rows) {
+                if (!objects[row.ID]) {
+                    objects[row.ID] = {
+                        ID: row.ID,
+                        objectNumber: row.objectNumber,
+                        objectName: row.objectName,
+                        objectCreator: row.objectCreator,
+                        objectCreatedDate: row.objectCreatedDate,
+                        entries: []
+                    };
+                }
 
-                // Skicka SQL-query till databasen och läs in variabler
-                const result2 = await connection.query('SELECT entryDate FROM ResearchEntries WHERE researchObjectID = "' + result[i]['ID'] + '"');
+                if (row.entryDate) {
+                    objects[row.ID].entries.push(row.entryDate);
+                }
+            }
 
-                // Calculate number of entries and last entry date
-                var entryCount = result2.length;
+            // Loopa igenom objekten och skapa HTML för varje objekt
+            for (const id in objects) {
+                const obj = objects[id];
+
+                const entryCount = obj.entries.length;
+
                 function parseDate(str) {
                     const [day, month, year] = str.split('.');
                     return new Date(year, month - 1, day);
                 }
-                let lastEntryDate;
-                if (entryCount === 0) {
-                    lastEntryDate = "N/A";
-                } else {
-                    lastEntryDate = result2.reduce((latest, current) => {
-                        return parseDate(current.entryDate) > parseDate(latest.entryDate)
-                            ? current
-                            : latest;
-                    }).entryDate;
+
+                let lastEntryDate = "N/A";
+                if (entryCount > 0) {
+                    lastEntryDate = obj.entries.reduce((latest, current) => {
+                        return parseDate(current) > parseDate(latest) ? current : latest;
+                    });
                 }
-                str_id = result[i]['ID'];
-                str_objectNumber = result[i]['objectNumber'];
-                str_objectName = result[i]['objectName'];
-                str_objectCreator = result[i]['objectCreator'];
-                str_objectCreateDate = result[i]['objectCreatedDate'];
+
 
 
                 // Lägg till respektive employee till utskrift-variabeln
                 htmlOutput += "<div class=\"resp-table-row\">\n";
-                htmlOutput += "<div class=\"table-body-cell\">" + str_objectNumber + "</div>\n";
-                htmlOutput += "<div class=\"table-body-cell-bigger\"><a href=\"http://localhost:3000/api/virusdatabase/" + str_id + "\">" + str_objectName + "</a></div>\n";
-                htmlOutput += "<div class=\"table-body-cell\"> " + str_objectCreateDate + "</div>\n";
-                htmlOutput += "<div class=\"table-body-cell\"> " + str_objectCreator + "</div>\n";
+                htmlOutput += "<div class=\"table-body-cell\">" + obj.objectNumber + "</div>\n";
+                htmlOutput += "<div class=\"table-body-cell-bigger\"><a href=\"http://localhost:3000/api/virusdatabase/" + obj.ID + "\">" + obj.objectName + "</a></div>\n";
+                htmlOutput += "<div class=\"table-body-cell\"> " + obj.objectCreatedDate + "</div>\n";
+                htmlOutput += "<div class=\"table-body-cell\"> " + obj.objectCreator + "</div>\n";
                 htmlOutput += "<div class=\"table-body-cell\"> " + entryCount + "</div>\n";
                 htmlOutput += "<div class=\"table-body-cell\"> " + lastEntryDate + "</div>\n";
-                if (request.session.loggedin) {
-                    htmlOutput += "<div class=\"table-body-cell\"><a href=\"http://localhost:3000/api/editvirus/" + str_id + "\" style=\"color:#336699;text-decoration:none;\">E</a></div>\n";
-                    htmlOutput += "<div class=\"table-body-cell\"><a href=\"http://localhost:3000/api/deletevirus/" + str_id + "\" style=\"color:#336699;text-decoration:none;\">D</a></div>\n";
+                if (request.session.securityAccessLevel == "A" || request.session.securityAccessLevel == "B") {
+                    htmlOutput += "<div class=\"table-body-cell\"><a href=\"http://localhost:3000/api/editvirus/" + obj.ID + "\" style=\"color:#336699;text-decoration:none;\">E</a></div>\n";
+                    htmlOutput += "<div class=\"table-body-cell\"><a href=\"http://localhost:3000/api/deletevirus/" + obj.ID + "\" style=\"color:#336699;text-decoration:none;\">D</a></div>\n";
                 }
                 htmlOutput += "</div>\n";
             }
@@ -171,34 +191,36 @@ router.get('/:id', function (request, response) {
         response.write(htmlMenu);
         response.write(htmlInfoStart);
 
-        // Skicka SQL-query till databasen och läs in variabler
-        const result = await connection.query("SELECT * FROM ResearchObjects WHERE ID = " + virusID + "");
-        str_virusID = result[0]['ID'];
-        str_objectNumber = result[0]['objectNumber'];
-        str_objectName = result[0]['objectName'];
-        str_objectCreator = result[0]['objectCreator'];
-        str_objectCreateDate = result[0]['objectCreatedDate'];
-        str_objectCreateTime = result[0]['objectCreatedTime'];
-        str_objectText = result[0]['objectText'];
-        str_objectStatus = result[0]['objectStatus'];
-        var str_presentationVideoLink = "";
-        var str_securityVideoLink = "";
-        if (result[0]['presentationVideoLink']) {
-            str_presentationVideoLink = result[0]['presentationVideoLink'];
-        }
-        if (result[0]['securityVideoLink']) {
-            str_securityVideoLink = result[0]['securityVideoLink'];
-        }
 
-        // Security file
-        const filePath = path.resolve(__dirname, "../data/safetydatasheets/" + str_objectNumber + ".pdf");
+        if (request.session.loggedin) {
+            // Skicka SQL-query till databasen och läs in variabler
+            const result = await connection.query("SELECT * FROM ResearchObjects WHERE ID = " + virusID + "");
+            str_virusID = result[0]['ID'];
+            str_objectNumber = result[0]['objectNumber'];
+            str_objectName = result[0]['objectName'];
+            str_objectCreator = result[0]['objectCreator'];
+            str_objectCreateDate = result[0]['objectCreatedDate'];
+            str_objectCreateTime = result[0]['objectCreatedTime'];
+            str_objectText = result[0]['objectText'];
+            str_objectStatus = result[0]['objectStatus'];
+            var str_presentationVideoLink = "";
+            var str_securityVideoLink = "";
+            if (result[0]['presentationVideoLink']) {
+                str_presentationVideoLink = result[0]['presentationVideoLink'];
+            }
+            if (result[0]['securityVideoLink']) {
+                str_securityVideoLink = result[0]['securityVideoLink'];
+            }
 
-        var virusFileName = "";
-        var virusLastModified = "";
-        var virusFileSizeKB = "";
+            // Security file
+            const filePath = path.resolve(__dirname, "../data/safetydatasheets/" + str_objectNumber + ".pdf");
 
-        // Skapa HTML-textsträng för tabellen för utskrift av XML-data
-        let htmlOutput = `
+            var virusFileName = "";
+            var virusLastModified = "";
+            var virusFileSizeKB = "";
+
+            // Skapa HTML-textsträng för tabellen för utskrift av XML-data
+            let htmlOutput = `
             <link rel="stylesheet" href="css/personnel_registry_employee.css">
             <div style="display: flex; justify-content: space-between; align-items: baseline; padding: 5px 0;">
                 <div style="flex: 1;">
@@ -212,7 +234,7 @@ router.get('/:id', function (request, response) {
                 </div>
             </div>
             `;
-        htmlOutput += `
+            htmlOutput += `
              <div style="background-color: #b0dfef; border: 1px solid blue; width: 650px; padding: 10px; margin: 10px 0;">
                 <p>` + str_objectText + `</p>
             </div>
@@ -220,34 +242,36 @@ router.get('/:id', function (request, response) {
             <div style="display:flex; gap:30px; align-items: center;">
             <h1>Security data sheet:</h1>
             `;
-        if (fs.existsSync(filePath)) {
-            try {
-                const stats = fs.statSync(filePath);
-                const virusFileName = path.basename(filePath);
-                const virusFileSizeKB = Math.round(stats.size / 1024) + 'kb';
-                const mtime = stats.mtime;
-                const day = String(mtime.getDate()).padStart(2, '0');
-                const month = String(mtime.getMonth() + 1).padStart(2, '0');
-                const year = mtime.getFullYear();
-                const virusLastModified = `${day}.${month}.${year}`;
+            if (fs.existsSync(filePath)) {
+                try {
+                    const stats = fs.statSync(filePath);
+                    const virusFileName = path.basename(filePath);
+                    const virusFileSizeKB = Math.round(stats.size / 1024) + 'kb';
+                    const mtime = stats.mtime;
+                    const day = String(mtime.getDate()).padStart(2, '0');
+                    const month = String(mtime.getMonth() + 1).padStart(2, '0');
+                    const year = mtime.getFullYear();
+                    const virusLastModified = `${day}.${month}.${year}`;
 
-                htmlOutput += `
+                    htmlOutput += `
             <span>${virusFileName}</span>
             <span>${virusFileSizeKB}</span>
             <span>${virusLastModified}</span>
         `;
-            } catch (err) {
-                console.error(err);
+                } catch (err) {
+                    console.error(err);
+                }
             }
-        }
-        htmlOutput = htmlOutput + `
+            htmlOutput = htmlOutput + `
             </div>
             <p />
             <div style="display:flex; gap:20px; align-items: center;"> <h1>Security Presentation Video</h1>` + str_presentationVideoLink + ` </div>
             <p />
             <div style="display:flex; gap:20px; align-items: center;"> <h1>Security Handling Video</h1> ` + str_securityVideoLink + ` </div>
             <p />
-            </div>
+            </div>`;
+            if (request.session.securityAccessLevel == "A" || request.session.securityAccessLevel == "B") {
+                htmlOutput += `
             <div style="display:flex; align-items: center; justify-content: right; width: 650px;">
             <a href="http://localhost:3000/api/editvirus/${str_virusID}" style="color:#336699;text-decoration:none;"> 
                 <button" style="margin-top:10px; padding:6px 14px; background:#4682B4;
@@ -257,10 +281,13 @@ router.get('/:id', function (request, response) {
                     Edit info
                 </button></a>
             </div>
-            `;
+            `
+            };
 
-        response.write(htmlOutput); // Skriv ut 
-
+            response.write(htmlOutput); // Skriv ut 
+        } else {
+            response.write("<h2>You are not logged in</h2>\n");
+        }
         response.write(htmlInfoStop);
         response.write(htmlFooter);
         response.write(htmlBottom);

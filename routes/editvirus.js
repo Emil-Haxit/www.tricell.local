@@ -38,7 +38,7 @@ router.post('/:id', function (request, response) {
     var id = request.params.id;
 
     // Ta emot variablerna från formuläret
-    if (request.session.loggedin) {
+    if (request.session.securityAccessLevel == "A" || request.session.securityAccessLevel == "B") {
         var form = new formidable.IncomingForm({ allowEmptyFiles: true });
         form.parse(request, function (err, fields, files) {
             var number = fields.number;
@@ -75,16 +75,15 @@ router.post('/:id', function (request, response) {
                 const result = await connection.execute("UPDATE ResearchObjects SET objectNumber='" + number + "', objectName='" + name + "', objectText='" + text + "', presentationVideoLink='" + presentationVideo + "', securityVideoLink='" + handlingVideo + "' WHERE ID=" + id);
 
                 // Ladda upp filen
-                /* 
-                if (files.ffile.originalFilename != "") {
-                    var oldpath = files.ffile.filepath;
-                    //var newpath = path.resolve(__dirname, "../public/fileuploadtemp/"+ files.ffile.originalFilename);
-                    var newpath = path.resolve(__dirname, "../public/photos/" + employeecode + ".jpg");
+                if (files.securityDataSheet.originalFilename != "") {
+                    var oldpath = files.securityDataSheet.filepath;
+                    //var newpath = path.resolve(__dirname, "../public/fileuploadtemp/"+ files.securityDataSheet.originalFilename);
+                    var newpath = path.resolve(__dirname, "../data/safetydatasheets/" + number + ".pdf");
                     fs.renameSync(oldpath, newpath, function (err) {
                         if (err) throw err;
                     });
                 }
-                */
+
                 // Ge respons till användaren
                 response.write("virus edited<br/><p /><a href=\"http://localhost:3000/api/virusdatabase\" style=\"color:#336699;text-decoration:none;\">Go back</a>");
 
@@ -106,7 +105,7 @@ router.post('/:id', function (request, response) {
         response.write(htmlMenu);
         response.write(htmlInfoStart);
 
-        response.write("Not logged in");
+        response.write("Not logged in or insufficient security access level");
 
         response.write(htmlInfoStop);
         response.write(htmlFooter);
@@ -159,7 +158,16 @@ router.get('/:id', (request, response) => {
         response.write(htmlMenu);
         response.write(htmlInfoStart);
 
-        if (request.session.loggedin) {
+        if (request.session.securityAccessLevel == "A" || request.session.securityAccessLevel == "B") {
+
+            // Kollar om personen har ett foto
+            const path = "./data/safetydatasheets/" + str_objectNumber + ".pdf";
+            if (fs.existsSync(path)) {
+                oldfile = "./data/safetydatasheets//" + str_objectNumber + ".pdf";
+            }
+            else {
+                oldfile = "test";
+            }
 
             htmlNewEmployeeCSS = readHTML('./masterframe/newemployee_css.html');
             response.write(htmlNewEmployeeCSS);
@@ -170,13 +178,13 @@ router.get('/:id', (request, response) => {
                 number: str_objectNumber,
                 name: str_objectName,
                 text: str_objectText,
-                securityDataSheet: "test",
+                securityDataSheet: oldfile,
                 securityPresentationVideo: str_presentationVideoLink,
                 securityHandlingVideo: str_securityVideoLink,
             }));
         }
         else {
-            response.write("Not logged in");
+            response.write("Not logged in or insufficient security access level");
         }
         response.write(htmlInfoStop);
         response.write(htmlFooter);

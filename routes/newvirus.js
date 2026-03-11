@@ -46,6 +46,21 @@ router.post('/', function (request, response) {
             var presentationVideo = fields.securityPresentationVideo;
             var handlingVideo = fields.securityHandlingVideo;
 
+            const today = new Date();
+
+            const day = String(today.getDate()).padStart(2, '0');
+            const month = String(today.getMonth() + 1).padStart(2, '0'); // månader är 0–11
+            const year = today.getFullYear();
+
+            const date = `${day}.${month}.${year}`;
+
+            const time = new Date().toLocaleTimeString('sv-SE', {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false
+            });
+
+
             // Öppna databasen
             const ADODB = require('node-adodb');
             const connection = ADODB.open('Provider=Microsoft.Jet.OLEDB.4.0;Data Source=./data/mdb/researchdata.mdb;');
@@ -70,23 +85,25 @@ router.post('/', function (request, response) {
                 response.write(htmlInfoStart);
 
 
-                // Skriv in i databasen
-                const result = await connection.execute("insert into ResearchObjects (objectNumber, objectName, objectText, objectCreator, objectCreatedDate, objectCreatedTime, presentationVideoLink, securityVideoLink) values ('" + number + "','" + name + "','" + text + "','" + request.cookies.employeecode + "','" + new Date().toLocaleDateString() + "','" + new Date().toLocaleTimeString() + "','" + presentationVideo + "','" + handlingVideo + "')");
+                if (request.session.securityAccessLevel == "A" || request.session.securityAccessLevel == "B") {
+                    // Skriv in i databasen
+                    const result = await connection.execute("insert into ResearchObjects (objectNumber, objectName, objectText, objectCreator, objectCreatedDate, objectCreatedTime, presentationVideoLink, securityVideoLink) values ('" + number + "','" + name + "','" + text + "','" + request.cookies.employeecode.toUpperCase() + "','" + date + "','" + time + "','" + presentationVideo + "','" + handlingVideo + "')");
 
-                // Ladda upp filen
-                /* 
-                if (files.ffile.originalFilename != "") {
-                    var oldpath = files.ffile.filepath;
-                    //var newpath = path.resolve(__dirname, "../public/fileuploadtemp/"+ files.ffile.originalFilename);
-                    var newpath = path.resolve(__dirname, "../public/photos/" + employeecode + ".jpg");
-                    fs.renameSync(oldpath, newpath, function (err) {
-                        if (err) throw err;
-                    });
+                    // Ladda upp filen
+                    if (files.securityDataSheet.originalFilename != "") {
+                        var oldpath = files.securityDataSheet.filepath;
+                        //var newpath = path.resolve(__dirname, "../public/fileuploadtemp/"+ files.ffile.originalFilename);
+                        var newpath = path.resolve(__dirname, "../data/safetydatasheets/" + number + ".pdf");
+                        fs.renameSync(oldpath, newpath, function (err) {
+                            if (err) throw err;
+                        });
+                    }
+
+                    // Ge respons till användaren
+                    response.write("virus added<br/><p /><a href=\"http://localhost:3000/api/virusdatabase\" style=\"color:#336699;text-decoration:none;\">Go back</a>");
+                } else {
+                    response.write("Not logged in or insufficient security access level");
                 }
-                */
-                // Ge respons till användaren
-                response.write("virus edited<br/><p /><a href=\"http://localhost:3000/api/virusdatabase\" style=\"color:#336699;text-decoration:none;\">Go back</a>");
-
 
                 response.write(htmlInfoStop);
                 response.write(htmlFooter);
@@ -137,7 +154,7 @@ router.get('/', (request, response) => {
         response.write(htmlMenu);
         response.write(htmlInfoStart);
 
-        if (request.session.loggedin) {
+        if (request.session.securityAccessLevel == "A" || request.session.securityAccessLevel == "B") {
 
             htmlNewEmployeeCSS = readHTML('./masterframe/newemployee_css.html');
             response.write(htmlNewEmployeeCSS);
@@ -147,7 +164,7 @@ router.get('/', (request, response) => {
             }));
         }
         else {
-            response.write("Not logged in");
+            response.write("Not logged in or insufficient security access level");
         }
         response.write(htmlInfoStop);
         response.write(htmlFooter);
