@@ -57,6 +57,9 @@ router.get('/', (request, response) => {
         response.write(htmlMenu);
         response.write(htmlInfoStart);
 
+        // Hämta nivå för att veta om vi ska dölja arkiverade rader
+        let userLevel = request.session.securityAccessLevel ? request.session.securityAccessLevel.toString().trim().toUpperCase() : "";
+
         // Skapa HTML-textsträng för tabellen för utskrift av XML-data
         let htmlOutput = "" +
             "<link rel=\"stylesheet\" href=\"css/personnel_registry.css\" \/>";
@@ -95,6 +98,7 @@ router.get('/', (request, response) => {
         ro.objectName,
         ro.objectCreator,
         ro.objectCreatedDate,
+        ro.objectStatus,
         re.entryDate
     FROM ResearchObjects ro
     LEFT JOIN ResearchEntries re
@@ -110,6 +114,7 @@ router.get('/', (request, response) => {
                         ID: row.ID,
                         objectNumber: row.objectNumber,
                         objectName: row.objectName,
+                        objectStatus: row.objectStatus,
                         objectCreator: row.objectCreator,
                         objectCreatedDate: row.objectCreatedDate,
                         entries: []
@@ -124,6 +129,13 @@ router.get('/', (request, response) => {
             // Loopa igenom objekten och skapa HTML för varje objekt
             for (const id in objects) {
                 const obj = objects[id];
+
+                // NY ÄNDRING: Om status är 'archive' och man INTE är nivå A -> Hoppa över denna rad helt
+                if (obj.objectStatus === 'archive' && userLevel !== 'A') {
+                    continue;
+                }
+
+                const archiveClass = (obj.objectStatus === 'archive') ? 'row-archived' : '';
 
                 const entryCount = obj.entries.length;
 
@@ -142,7 +154,7 @@ router.get('/', (request, response) => {
 
 
                 // Lägg till respektive employee till utskrift-variabeln
-                htmlOutput += "<div class=\"resp-table-row\">\n";
+                htmlOutput += "<div class= 'resp-table-row " + archiveClass + "'>\n";
                 htmlOutput += "<div class=\"table-body-cell\">" + obj.objectNumber + "</div>\n";
                 htmlOutput += "<div class=\"table-body-cell-bigger\"><a href=\"http://localhost:3000/api/virusdatabase/" + obj.ID + "\">" + obj.objectName + "</a></div>\n";
                 htmlOutput += "<div class=\"table-body-cell\"> " + obj.objectCreatedDate + "</div>\n";
@@ -171,6 +183,32 @@ router.get('/', (request, response) => {
     sqlQuery();
 });
 
+// --------------------- Växla Open/Archive -------------------
+router.get('/toggle/:id', async function (request, response) {
+    const targetId = request.params.id;
+
+    let userLevel = request.session.securityAccessLevel || "";
+    userLevel = userLevel.toString().trim().toUpperCase();
+
+    if (userLevel !== 'A') {
+        return response.status(403).send("<h1>Nekat</h1><p>Bara administratörer (A) får göra detta.</p>");
+    }
+
+    const ADODB = require('node-adodb');
+    const connection = ADODB.open('Provider=Microsoft.Jet.OLEDB.4.0;Data Source=./data/mdb/researchdata.mdb;');
+
+    try {
+        const result = await connection.query(`SELECT objectStatus FROM ResearchObjects WHERE id = ${targetId}`);
+        if (result.length > 0) {
+            const currentStatus = result[0].objectStatus;
+            const newStatus = (currentStatus === 'open') ? 'archive' : 'open';
+            await connection.execute(`UPDATE ResearchObjects SET objectStatus = '${newStatus}' WHERE id = ${targetId}`);
+        }
+        response.redirect('/api/virusdatabase/' + targetId);
+    } catch (error) {
+        response.status(500).send("Update failed.");
+    }
+});
 
 // --------------------- Läs en specifik virus-----------------------------
 router.get('/:id', function (request, response) {
@@ -180,6 +218,7 @@ router.get('/:id', function (request, response) {
     const ADODB = require('node-adodb');
     const connection = ADODB.open('Provider=Microsoft.Jet.OLEDB.4.0;Data Source=./data/mdb/researchdata.mdb;');
 
+    let level = request.session.securityAccessLevel ? request.session.securityAccessLevel.toString().trim().toUpperCase() : "";
     async function sqlQuery() {
         response.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
         response.write(htmlHead);
@@ -222,6 +261,12 @@ router.get('/:id', function (request, response) {
             if (result[0]['securityVideoLink']) {
                 str_securityVideoLink = result[0]['securityVideoLink'];
             }
+
+            const btnText = (str_objectStatus === 'open') ? 'Archive Object' : 'Open Object';
+
+            let toggleUrl = (level === 'A')
+                ? `/api/virusdatabase/toggle/${str_virusID}`
+                : `javascript:alert('Access denied. Incorrect permissions.');`;
 
             // Security file
             const filePath = path.resolve(__dirname, "../data/safetydatasheets/" + str_objectNumber + ".pdf");
@@ -289,6 +334,10 @@ router.get('/:id', function (request, response) {
                                font-size:12px; font-weight:bold; cursor:pointer;">
                     Edit info
                 </button></a>
+            <a href="${toggleUrl}" class='edit-btn'><button style="margin-top:10px; padding:6px 14px; background:#4682B4;
+                 color:#000;
+                               border:1px solid #000; border-radius:0;
+                               font-size:12px; font-weight:bold; cursor:pointer;">${btnText}</button></a>
                 <a href="http://localhost:3000/api/virusdatabase/backup/${str_virusID}" style="color:#336699;text-decoration:none;"> 
                 <button style="margin-top:10px; padding:6px 14px; background:#4682B4;
                  color:#000; border:1px solid #000; border-radius:0; font-size:12px; font-weight:bold; cursor:pointer;">

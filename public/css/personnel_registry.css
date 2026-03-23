@@ -1,18 +1,18 @@
-#table-resp
-{
+#table-resp {
 	width: 716px;
 	display: table;
 	font-size: 12px;
-	font-family : Arial, Verdana, Geneva, Helvetica, sans-serif;
+	font-family: Arial, Verdana, Geneva, Helvetica, sans-serif;
 	color: #000000;
 }
-#table-header
-{
+
+#table-header {
 	display: table-header-group;
 	height: 30px;
 }
-.table-header-cell-light, .table-header-cell-dark
-{
+
+.table-header-cell-light,
+.table-header-cell-dark {
 	display: table-cell;
 	border: 1px solid;
 	border-color: #000000;
@@ -20,29 +20,34 @@
 	vertical-align: middle;
 	font-weight: bold;
 }
-.table-header-cell-light
-{
+
+.table-header-cell-light {
 	text-align: center;
 	background-color: #b0dfdf;
 }
-.table-header-cell-dark
-{
+
+.table-header-cell-dark {
 	padding: 5px;
 	text-align: left;
 	vertical-align: middle;
 	background-color: #548d8d;
 	font-size: 16px;
 }
-#table-body
-{
+
+#table-body {
 	display: table-row-group;
 }
-.resp-table-row
-{
+
+.row-archived {
+	color: lightgray;
+}
+
+.resp-table-row {
 	display: table-row;
 }
-.table-body-cell, .table-body-cell-bigger
-{
+
+.table-body-cell,
+.table-body-cell-bigger {
 	display: table-cell;
 	border: 1px solid;
 	border-color: #000000;
@@ -50,8 +55,8 @@
 	text-align: center;
 	vertical-align: middle;
 }
-.table-body-cell-bigger
-{
+
+.table-body-cell-bigger {
 	text-align: left;
 	height: 20px;
 	background-color: #cccccc;
