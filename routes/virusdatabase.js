@@ -13,6 +13,8 @@ const readHTML = require('../readHTML.js');
 const backupVirus = require('../backup.js');
 const fs = require('fs');
 
+const { getVirusImagesHTML } = require('./virusimages.js');
+
 var htmlHead = readHTML('./masterframe/head.html');
 var htmlHeader = readHTML('./masterframe/header.html');
 var htmlMenu = readHTML('./masterframe/menu.html');
@@ -24,6 +26,9 @@ var htmlBottom = readHTML('./masterframe/bottom.html');
 var entriesCSS = readHTML('./masterframe/researchentries_css.html');
 var entrieJS = readHTML('./masterframe/researchentries_js.html');
 var entriesHTML = readHTML('./masterframe/researchentries.html');
+
+// virus images
+var htmlVirusImagesCSS = readHTML('./masterframe/virusimages_css.html');
 
 // ---------------------- Lista all personal, Metod 4: Databas -------------------------------
 router.get('/', (request, response) => {
@@ -194,6 +199,7 @@ router.get('/:id', function (request, response) {
         }
         response.write(htmlHeader);
         response.write(htmlMenu);
+        response.write(htmlVirusImagesCSS);
         response.write(htmlInfoStart);
 
 
@@ -296,6 +302,8 @@ router.get('/:id', function (request, response) {
             response.write(entriesCSS);
             response.write(entrieJS);
             response.write(entriesHTML);
+
+            response.write(getVirusImagesHTML(virusID));
         } else {
             response.write("<h2>You are not logged in</h2>\n");
         }

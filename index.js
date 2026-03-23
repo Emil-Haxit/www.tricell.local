@@ -7,6 +7,18 @@ const bodyParser = require('body-parser');
 const app = express();                  /* Skapa webbserver-objektet */
 app.use(express.static('./public'));    /* Skapa global path till "public"-mappen */
 
+// images from data
+app.use("/data", express.static("data", {
+    index: false,
+    dotfiles: "deny",
+    extensions: ["png", "jpg", "jpeg", "gif"],
+    setHeaders: (res, path) => {
+        if (!/\.(png|jpg|jpeg|gif)$/i.test(path)) {
+            res.status(403).end("Forbidden");
+        }
+    }
+}));
+
 var cookieParser = require('cookie-parser');
 app.use(cookieParser());
 
@@ -58,6 +70,7 @@ const getchat = require('./routes/getchat');
 const chat = require('./routes/chat');
 const entries = require('./routes/entries.js');
 const fileUploadRouter = require('./routes/fileuploadvirus.js');
+const editVirusImage = require('./routes/editvirusimage.js');
 
 
 /* -------------- Skapa default-router (om ingen under-sökväg anges av användaren) --------------------- */
@@ -109,6 +122,7 @@ app.use('/api/getchat', getchat);
 app.use('/api/chat', chat);
 app.use('/api/entries', entries);
 app.use('/api/data', fileUploadRouter);
+app.use('/api/editvirusimage', editVirusImage);
 
 
 /* ---------------------------------- Starta webbservern ------------------------------ */

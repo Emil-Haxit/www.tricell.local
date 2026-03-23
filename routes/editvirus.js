@@ -13,6 +13,7 @@ const pug = require('pug');
 const { response } = require('express');
 const pug_loggedinmenu = pug.compileFile('./masterframe/loggedinmenu.html');
 const pug_editVirus = pug.compileFile('./masterframe/editVirus.pug');
+const { getVirusImagesHTML } = require('./virusimages.js');
 
 
 
@@ -31,6 +32,9 @@ var htmlBottom = readHTML('./masterframe/bottom.html');
 var htmlLoggedinMenuCSS = readHTML('./masterframe/loggedinmenu_css.html');
 var htmlLoggedinMenuJS = readHTML('./masterframe/loggedinmenu_js.html');
 var htmlLoggedinMenu = readHTML('./masterframe/loggedinmenu.html');
+
+// virus images
+var htmlVirusImagesCSS = readHTML('./masterframe/virusimages_css.html');
 
 
 // ---------------------- Editera virus ------------------------------------------------
@@ -103,6 +107,7 @@ router.post('/:id', function (request, response) {
         response.write(htmlHead);
         response.write(htmlHeader);
         response.write(htmlMenu);
+        response.write(htmlLoggedinMenuCSS);
         response.write(htmlInfoStart);
 
         response.write("Not logged in or insufficient security access level");
@@ -156,6 +161,8 @@ router.get('/:id', (request, response) => {
         }
         response.write(htmlHeader);
         response.write(htmlMenu);
+        response.write(htmlVirusImagesCSS);
+        response.write(htmlLoggedinMenuCSS);
         response.write(htmlInfoStart);
 
         if (request.session.securityAccessLevel == "A" || request.session.securityAccessLevel == "B") {
@@ -169,10 +176,6 @@ router.get('/:id', (request, response) => {
                 oldfile = "test";
             }
 
-            htmlNewEmployeeCSS = readHTML('./masterframe/newemployee_css.html');
-            response.write(htmlNewEmployeeCSS);
-            htmlNewEmployeeJS = readHTML('./masterframe/newemployee_js.html');
-            response.write(htmlNewEmployeeJS);
             response.write(pug_editVirus({
                 virusid: str_virusID,
                 number: str_objectNumber,
@@ -182,6 +185,7 @@ router.get('/:id', (request, response) => {
                 securityPresentationVideo: str_presentationVideoLink,
                 securityHandlingVideo: str_securityVideoLink,
             }));
+            response.write(getVirusImagesHTML(id));
         }
         else {
             response.write("Not logged in or insufficient security access level");
