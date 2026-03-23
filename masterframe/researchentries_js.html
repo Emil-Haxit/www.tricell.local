@@ -1,0 +1,63 @@
+<script language="JavaScript">
+
+    function submitEntry() {
+        //Tar fram virus id
+        const currentURL = window.location.href;
+        const splitUrl = currentURL.split("/");
+        const id = splitUrl[splitUrl.length - 1];
+
+        //Form check
+        if (document.entryForm.newEntry.value != "" && document.entryForm.entryHeadingInput.value != "") {
+            var http = new XMLHttpRequest();
+            http.open("POST", "http://localhost:3000/api/entries/" + id + "", true);
+            http.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            var params = "entryHeading=" + document.getElementById('entryHeadingInput').value + "&entryText=" + document.getElementById('newEntry').value;
+            http.send(params);
+
+            http.onload = function () {
+                refreshEntry();
+                document.getElementById("entryHeadingInput").value = "";
+                document.getElementById("newEntry").value = "";
+            }
+        }
+        else {
+            alert("Cant leave an empty research entry");
+        }
+    }
+</script>
+
+<script language="JavaScript">
+    function deleteEntry(id) {
+        var http = new XMLHttpRequest();
+        http.open("DELETE", "http://localhost:3000/api/entries/" + id + "", true);
+        http.onload = function () {
+            refreshEntry();
+        }
+        http.send();
+    }
+</script>
+
+<script language="JavaScript">
+
+    function refreshEntry() {
+        const currentURL = window.location.href;
+        const splitUrl = currentURL.split("/");
+        const id = splitUrl[splitUrl.length - 1];
+        const xhttp = new XMLHttpRequest();
+
+        xhttp.onload = function () {
+            document.getElementById("pastEntryBox").innerHTML = this.responseText;
+        }
+        xhttp.open("GET", "http://localhost:3000/api/entries/" + id + "", true);
+        xhttp.send();
+
+    }
+
+    window.addEventListener('DOMContentLoaded', (event) => {
+        refreshEntry();
+        setInterval(function () {
+            refreshEntry();
+
+        }, 1500);
+    });
+</script>

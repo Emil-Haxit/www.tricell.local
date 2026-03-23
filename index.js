@@ -56,6 +56,7 @@ const deleteemployee = require('./routes/deleteemployee');
 const editemployee = require('./routes/editemployee');
 const getchat = require('./routes/getchat');
 const chat = require('./routes/chat');
+const entries = require('./routes/entries.js');
 
 
 /* -------------- Skapa default-router (om ingen under-sökväg anges av användaren) --------------------- */
@@ -105,6 +106,7 @@ app.use('/api/deleteemployee', deleteemployee);
 app.use('/api/editemployee', editemployee);
 app.use('/api/getchat', getchat);
 app.use('/api/chat', chat);
+app.use('/api/entries', entries);
 
 
 /* ---------------------------------- Starta webbservern ------------------------------ */

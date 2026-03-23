@@ -21,6 +21,10 @@ var htmlInfoStop = readHTML('./masterframe/infoStop.html');
 var htmlFooter = readHTML('./masterframe/footer.html');
 var htmlBottom = readHTML('./masterframe/bottom.html');
 
+var entriesCSS = readHTML('./masterframe/researchentries_css.html');
+var entrieJS = readHTML('./masterframe/researchentries_js.html');
+var entriesHTML = readHTML('./masterframe/researchentries.html');
+
 // ---------------------- Lista all personal, Metod 4: Databas -------------------------------
 router.get('/', (request, response) => {
     // Öppna databasen
@@ -289,6 +293,9 @@ router.get('/:id', function (request, response) {
             };
 
             response.write(htmlOutput); // Skriv ut 
+            response.write(entriesCSS);
+            response.write(entrieJS);
+            response.write(entriesHTML);
         } else {
             response.write("<h2>You are not logged in</h2>\n");
         }
@@ -428,6 +435,10 @@ router.get('/backup/:id', function (request, response) {
             };
 
             response.write(htmlOutput); // Skriv ut 
+
+            response.write(entriesCSS);
+            response.write(entrieJS);
+            response.write(entriesHTML);
         } else {
             response.write("<h2>You are not logged in</h2>\n");
         }
