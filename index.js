@@ -71,6 +71,7 @@ const chat = require('./routes/chat');
 const entries = require('./routes/entries.js');
 const fileUploadRouter = require('./routes/fileuploadvirus.js');
 const editVirusImage = require('./routes/editvirusimage.js');
+const activityLog = require('./routes/activityLog.js');
 
 
 /* -------------- Skapa default-router (om ingen under-sökväg anges av användaren) --------------------- */
@@ -124,6 +125,7 @@ app.use('/api/chat', chat);
 app.use('/api/entries', entries);
 app.use('/api/data', fileUploadRouter);
 app.use('/api/editvirusimage', editVirusImage);
+app.use('/api/activitylog', activityLog);
 
 
 /* ---------------------------------- Starta webbservern ------------------------------ */

@@ -63,11 +63,21 @@ router.get('/', function (request, response) {
                         let year = date_ob.getFullYear();
                         str_lastlogin = date + "." + month + "." + year;
 
+                        let hourOfLogin = date_ob.getHours();
+                        let minuteOfLogin = date_ob.getMinutes();
+                        let timeOfLogin = ""
+                        timeOfLogin = hourOfLogin + ":" + minuteOfLogin;
+
                         // Set cookies
                         response.cookie("employeecode", employeeid);
                         response.cookie("name", str_name);
                         response.cookie("lastlogin", str_lastlogin);
                         response.cookie("logintimes", int_logintimes);
+
+                        // Create sorting settings cookies
+                        response.cookie("sortAmount", 20);
+                        response.cookie("sortType", "ID");
+
 
                         //Starta sessions
                         request.session.loggedin = true;
@@ -101,37 +111,59 @@ router.get('/', function (request, response) {
 // --------------------- Router -----------------------------------------------
 router.get('/:success', function (request, response) {
 
-    response.setHeader('Content-type', 'text/html');
-    response.write(htmlHead);
-    response.write(htmlHeader);
-    response.write(htmlMenu);
-    response.write(htmlInfoStart);
+    const ADODB = require('node-adodb');
+    const connection = ADODB.open('Provider=Microsoft.Jet.OLEDB.4.0;Data Source=./data/mdb/activity_log.mdb');
 
-    if (request.session.loggedin) {
-        response.write("Login successful");
-        htmlLoggedinMenuCSS = readHTML('./masterframe/loggedinmenu_css.html');
-        response.write(htmlLoggedinMenuCSS);
-        htmlLoggedinMenuJS = readHTML('./masterframe/loggedinmenu_js.html');
-        response.write(htmlLoggedinMenuJS);
-        //htmlLoggedinMenu = readHTML('./masterframe/loggedinmenu.html');
-        //response.write(htmlLoggedinMenu);
-        response.write(pug_loggedinmenu({
-            employeecode: request.cookies.employeecode,
-            name: request.cookies.name,
-            logintimes: request.cookies.logintimes,
-            lastlogin: request.cookies.lastlogin,
-            securityAccessLevel: request.session.securityAccessLevel
-        }));
+    async function activityLog() {
+        response.setHeader('Content-type', 'text/html');
+        response.write(htmlHead);
+        response.write(htmlHeader);
+        response.write(htmlMenu);
+        response.write(htmlInfoStart);
+
+        if (request.session.loggedin) {
+            const deleteRow150 = connection.execute("DELETE FROM Log WHERE ID NOT IN (SELECT TOP 150 ID FROM Log ORDER BY ID ASC)");
+
+            let ts = Date.now();
+            let date_ob = new Date(ts);
+            let date = date_ob.getDate();
+            let month = date_ob.getMonth() + 1;
+            let year = date_ob.getFullYear();
+            str_lastlogin = date + "." + month + "." + year;
+
+            let hourOfLogin = date_ob.getHours();
+            let minuteOfLogin = date_ob.getMinutes();
+            let timeOfLogin = ""
+            timeOfLogin = hourOfLogin + ":" + minuteOfLogin;
+
+            response.write("Login successful");
+            htmlLoggedinMenuCSS = readHTML('./masterframe/loggedinmenu_css.html');
+            response.write(htmlLoggedinMenuCSS);
+            htmlLoggedinMenuJS = readHTML('./masterframe/loggedinmenu_js.html');
+            response.write(htmlLoggedinMenuJS);
+            //htmlLoggedinMenu = readHTML('./masterframe/loggedinmenu.html');
+            //response.write(htmlLoggedinMenu);
+            response.write(pug_loggedinmenu({
+                employeecode: request.cookies.employeecode,
+                name: request.cookies.name,
+                logintimes: request.cookies.logintimes,
+                lastlogin: request.cookies.lastlogin,
+                securityAccessLevel: request.session.securityAccessLevel
+            }));
+            const updateLog = connection.execute("INSERT INTO Log (Activity, EmployeeCode, [Name], [Date], [Time]) " +
+                "VALUES (\"Login\", \"" + request.cookies.employeecode + "\", \"" + request.cookies.name + "\", \"" + str_lastlogin + "\", \"" + timeOfLogin + "\")");
+        }
+        else {
+            response.write("Not logged in");
+        }
+
+        response.write(htmlInfoStop);
+        response.write(htmlFooter);
+        response.write(htmlBottom);
+        response.end();
+
     }
-    else {
-        response.write("Not logged in");
-    }
-
-    response.write(htmlInfoStop);
-    response.write(htmlFooter);
-    response.write(htmlBottom);
-    response.end();
-
+    activityLog();
 });
 
 // --------------------- Router -----------------------------------------------
