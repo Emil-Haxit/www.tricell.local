@@ -10,8 +10,7 @@ router.use(express.static('./public'));
 const path = require('path');
 
 const pug = require('pug');
-const { response } = require('express');
-const pug_loggedinmenu = pug.compileFile('./masterframe/loggedinmenu.html');
+const { response } = require('express'); const pug_loggedinmenu = pug.compileFile('./masterframe/loggedinmenu.pug');
 
 
 
@@ -49,6 +48,7 @@ router.get('/:id', (request, response) => {
                 name: request.cookies.name,
                 logintimes: request.cookies.logintimes,
                 lastlogin: request.cookies.lastlogin,
+                securityAccessLevel: request.session.securityAccessLevel
             }));
         }
         response.write(htmlHeader);

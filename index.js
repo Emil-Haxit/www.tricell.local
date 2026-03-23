@@ -37,7 +37,7 @@ app.use(
 
 const pug = require('pug');
 const { response } = require('express');
-const pug_loggedinmenu = pug.compileFile('./masterframe/loggedinmenu.html');
+const pug_loggedinmenu = pug.compileFile('./masterframe/loggedinmenu.pug');
 
 /* ------------------------------ Egna moduler ----------------------------------- */
 const readHTML = require('./readHTML.js');
@@ -92,6 +92,7 @@ app.get('/', function (request, response) {
             name: request.cookies.name,
             logintimes: request.cookies.logintimes,
             lastlogin: request.cookies.lastlogin,
+            securityAccessLevel: request.session.securityAccessLevel
         }));
     }
 

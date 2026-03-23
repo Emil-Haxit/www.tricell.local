@@ -11,7 +11,7 @@ const path = require('path');
 
 const pug = require('pug');
 const { response } = require('express');
-const pug_loggedinmenu = pug.compileFile('./masterframe/loggedinmenu.html');
+const pug_loggedinmenu = pug.compileFile('./masterframe/loggedinmenu.pug');
 const pug_editVirus = pug.compileFile('./masterframe/editVirus.pug');
 const { getVirusImagesHTML } = require('./virusimages.js');
 
@@ -48,6 +48,7 @@ router.post('/:id', function (request, response) {
             var number = fields.number;
             var name = fields.name;
             var text = fields.text;
+            text = text.replace(/'/g, "''");
             var presentationVideo = fields.securityPresentationVideo;
             var handlingVideo = fields.securityHandlingVideo;
 
@@ -67,6 +68,7 @@ router.post('/:id', function (request, response) {
                         name: request.cookies.name,
                         logintimes: request.cookies.logintimes,
                         lastlogin: request.cookies.lastlogin,
+                        securityAccessLevel: request.session.securityAccessLevel
                     }));
                 }
                 response.write(htmlLoggedinMenu);
@@ -157,6 +159,7 @@ router.get('/:id', (request, response) => {
                 name: request.cookies.name,
                 logintimes: request.cookies.logintimes,
                 lastlogin: request.cookies.lastlogin,
+                securityAccessLevel: request.session.securityAccessLevel
             }));
         }
         response.write(htmlHeader);

@@ -1,0 +1,143 @@
+#loggedinMenuLayer
+    #userinfo
+        b User info:
+        br
+        p Employee Code: #{employeecode}
+        p Name: #{name}
+        p Login times: #{logintimes}
+        p Last login: #{lastlogin}
+
+    #chatbutton(onclick="showChatLayer()" style="cursor:pointer;")
+        | Chat 
+        span#chatnumber
+
+    #topsecret
+        b TOP SECRET
+        br
+        | MATERIAL
+
+    table(border="0" cellspacing="0" cellpadding="0")
+        tr
+            td(height="1" width="150" bgcolor="#003366")
+
+    .loggedinbutton
+        a(href="javascript:void(0)" onclick="showCalcLayer()" style="color:#336699;text-decoration:none;") Tricell Calculator
+
+    table(border="0" cellspacing="0" cellpadding="0")
+        tr
+            td(height="1" width="150" bgcolor="#003366")
+
+    .loggedinbutton
+        a(href="http://localhost:3000/api/personnelregistry" style="color:#336699;text-decoration:none;") User Database
+
+    table(border="0" cellspacing="0" cellpadding="0")
+        tr
+            td(height="1" width="150" bgcolor="#003366")
+
+    // -----------------------------------------
+    // CONDITIONAL RESEARCH SECTION (A or B only)
+    // -----------------------------------------
+    if securityAccessLevel === 'A' || securityAccessLevel === 'B'
+        #researchSection
+            .loggedinbutton
+                a#researchDbLink(href="javascript:void(0)" style="color:#aaaaaa;text-decoration:none;cursor:default;") Research Database
+
+            div(style="padding:2px 8px 4px 8px;font-size:11px;")
+                span#hqDot(style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#cc0000;margin-right:5px;vertical-align:middle;")
+                span#hqStatusText(style="color:#cc0000;") Not connected
+
+            table(border="0" cellspacing="0" cellpadding="0")
+                tr
+                    td(height="1" width="150" bgcolor="#003366")
+
+            .loggedinbutton
+                a(href="javascript:void(0)" onclick="openHQPopup()" style="color:#336699;text-decoration:none;") Connect to HQ
+
+            table(border="0" cellspacing="0" cellpadding="0")
+                tr
+                    td(height="1" width="150" bgcolor="#003366")
+
+    .loggedinbutton
+        a(href="http://localhost:3000/api/logout" style="color:#336699;text-decoration:none;") Log out
+
+    table(border="0" cellspacing="0" cellpadding="0")
+        tr
+            td(height="1" width="150" bgcolor="#003366")
+
+
+#hqPopup(style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:100;background:#ffffff;border:2px solid #003366;width:360px;padding:24px;box-shadow:0 4px 20px rgba(0,0,0,0.3);font-family:monospace;")
+    div(style="font-weight:bold;font-size:13px;color:#003366;margin-bottom:16px;letter-spacing:2px;") [ TRICELL HQ — SECURE CONNECT ]
+    #hqChecklist(style="font-size:11px;color:#000000;line-height:2;")
+        #hqStep0 &#9633; Checking server up-status...
+        #hqStep1 &#9633; Loading connection bootstrap...
+        #hqStep2 &#9633; Starting encryption engine...
+        #hqStep3 &#9633; Creating VPN-tunnel...
+        #hqStep4 &#9633; Checking credentials...
+        #hqStep5 &#9633; Loading database handshake...
+        #hqStep6 &#9633; Try/catch connecting...
+        #hqStep7 &#9633; Checking connection status...
+    #hqDoneMsg(style="display:none;margin-top:14px;color:#2a7a2a;font-size:12px;font-weight:bold;letter-spacing:1px;") You are connected
+
+
+#chatLayer
+    #chatLayerTitle
+        | Tricell Chat 
+        span(style="float:right;cursor:pointer;" onclick="showChatLayer()") X
+    #chatLayerMessages
+    input#chatmessage(type="text" placeholder="Type a message..." onkeydown="if(event.key==='Enter'){submitChat();refreshChat();}")
+    button#chatSendButton(onclick="submitChat();refreshChat();") Send
+
+
+#calcLayer
+    h3 Tricell Calculator
+    form(name="calc")
+        table#calculator
+            tr
+                td.calccell(colspan="4")
+                    input.calcdisplay(type="text" name="display")
+
+            tr
+                td.calccell
+                    input.calcbutton(type="button" value="C" onclick="resetDisplay()")
+                td
+                td
+                td.calccell
+                    input.calcbutton(type="button" value="/" onclick="calc.display.value+='/'")
+
+            tr
+                td.calccell
+                    input.calcbutton(type="button" value="7" onclick="updateDisplay('7')")
+                td.calccell
+                    input.calcbutton(type="button" value="8" onclick="updateDisplay('8')")
+                td.calccell
+                    input.calcbutton(type="button" value="9" onclick="updateDisplay('9')")
+                td.calccell
+                    input.calcbutton(type="button" value="*" onclick="updateDisplay('*')")
+
+            tr
+                td.calccell
+                    input.calcbutton(type="button" value="4" onclick="updateDisplay('4')")
+                td.calccell
+                    input.calcbutton(type="button" value="5" onclick="updateDisplay('5')")
+                td.calccell
+                    input.calcbutton(type="button" value="6" onclick="updateDisplay('6')")
+                td.calccell
+                    input.calcbutton(type="button" value="-" onclick="updateDisplay('-')")
+
+            tr
+                td.calccell
+                    input.calcbutton(type="button" value="1" onclick="updateDisplay('1')")
+                td.calccell
+                    input.calcbutton(type="button" value="2" onclick="updateDisplay('2')")
+                td.calccell
+                    input.calcbutton(type="button" value="3" onclick="updateDisplay('3')")
+                td.calccell
+                    input.calcbutton(type="button" value="+" onclick="updateDisplay('+')")
+
+            tr
+                td.calccell
+                    input.calcbutton(type="button" value="0" onclick="updateDisplay('0')")
+                td
+                td
+                td.calccell
+                    input.calcbutton(type="button" value="=" onclick="calculate()")

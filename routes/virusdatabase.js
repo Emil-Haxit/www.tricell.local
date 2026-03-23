@@ -6,7 +6,7 @@ const path = require('path');
 
 const pug = require('pug');
 const { response } = require('express');
-const pug_loggedinmenu = pug.compileFile('./masterframe/loggedinmenu.html');
+const pug_loggedinmenu = pug.compileFile('./masterframe/loggedinmenu.pug');
 
 // --------------------- Läs in Masterframen --------------------------------
 const readHTML = require('../readHTML.js');
@@ -51,6 +51,7 @@ router.get('/', (request, response) => {
                 name: request.cookies.name,
                 logintimes: request.cookies.logintimes,
                 lastlogin: request.cookies.lastlogin,
+                securityAccessLevel: request.session.securityAccessLevel
             }));
         }
         response.write(htmlHeader);
@@ -234,6 +235,7 @@ router.get('/:id', function (request, response) {
                 name: request.cookies.name,
                 logintimes: request.cookies.logintimes,
                 lastlogin: request.cookies.lastlogin,
+                securityAccessLevel: request.session.securityAccessLevel
             }));
         }
         response.write(htmlHeader);
@@ -388,6 +390,7 @@ router.get('/backup/:id', function (request, response) {
                 name: request.cookies.name,
                 logintimes: request.cookies.logintimes,
                 lastlogin: request.cookies.lastlogin,
+                securityAccessLevel: request.session.securityAccessLevel
             }));
         }
         response.write(htmlHeader);

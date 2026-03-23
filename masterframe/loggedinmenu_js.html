@@ -1,94 +1,122 @@
-
-    <script language="JavaScript">
-    function showCalcLayer()
-    {
-        if(document.getElementById('calcLayer').style.display=='block')
-        {
-            document.getElementById('calcLayer').style.display='none';
+<script language="JavaScript">
+    function showCalcLayer() {
+        if (document.getElementById('calcLayer').style.display == 'block') {
+            document.getElementById('calcLayer').style.display = 'none';
         }
-        else
-        {
-            document.getElementById('calcLayer').style.display='block';
+        else {
+            document.getElementById('calcLayer').style.display = 'block';
         }
     }
-    </script>
-    
-    <script language="JavaScript">
-    function resetDisplay()
-    {
+</script>
+
+<script language="JavaScript">
+    function resetDisplay() {
         document.calc.display.value = "";
     }
-    function updateDisplay(invalue)
-    {
+    function updateDisplay(invalue) {
         document.calc.display.value = document.calc.display.value + invalue;
     }
-    function calculate()
-    {
+    function calculate() {
         document.calc.display.value = eval(document.calc.display.value);
     }
-    </script>
-    
-    <script language="JavaScript">
-    function refreshChat()
-    {
-    const xhttp2 = new XMLHttpRequest();
-    xhttp2.onload = function() 
-    {
-       document.getElementById("chatLayerMessages").innerHTML = this.responseText;
-        var elem = document.getElementById('chatLayer');
-        elem.scrollTop = elem.scrollHeight;
-    }
-    xhttp2.open("GET","http://localhost:3000/api/chat",true);
-    xhttp2.send()
+</script>
+
+<script language="JavaScript">
+    function refreshChat() {
+        const xhttp2 = new XMLHttpRequest();
+        xhttp2.onload = function () {
+            document.getElementById("chatLayerMessages").innerHTML = this.responseText;
+            var elem = document.getElementById('chatLayer');
+            elem.scrollTop = elem.scrollHeight;
+        }
+        xhttp2.open("GET", "http://localhost:3000/api/chat", true);
+        xhttp2.send()
     }
 
-    function showChatLayer()
-    {
-        if(document.getElementById('chatLayer').style.display=='block')
-        {
-            document.getElementById('chatLayer').style.display='none';
+    function showChatLayer() {
+        if (document.getElementById('chatLayer').style.display == 'block') {
+            document.getElementById('chatLayer').style.display = 'none';
         }
-        else
-        {
-            document.getElementById('chatLayer').style.display='block';
+        else {
+            document.getElementById('chatLayer').style.display = 'block';
             refreshChat();
-            setInterval(function() 
-	        {
+            setInterval(function () {
                 refreshChat();
             }, 5000); //5 seconds
         }
     }
 
-    function submitChat()
-    {
+    function submitChat() {
 
         var http = new XMLHttpRequest();
         http.open("POST", "http://localhost:3000/api/chat", true);
-        http.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+        http.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
         var params = "MAX_FILE_SIZE=50000000&chatmessage=" + document.getElementById('chatmessage').value;
         http.send(params);
 
-        http.onload = function() 
-        {
+        http.onload = function () {
             document.getElementById("chatmessage").value = this.responseText;
         }
 
     }
-    </script>
-    
-    <script language="JavaScript">
-    function loadChat()
-    {
+</script>
+
+<script language="JavaScript">
+    function loadChat() {
         const xhttp = new XMLHttpRequest();
-        setInterval(function() 
-	    {
-           xhttp.onload = function() 
-           {
-	            document.getElementById("chatnumber").innerHTML = this.responseText;
-           }
-           xhttp.open("GET","http://localhost:3000/api/getchat",true);
-           xhttp.send();
+        setInterval(function () {
+            xhttp.onload = function () {
+                document.getElementById("chatnumber").innerHTML = this.responseText;
+            }
+            xhttp.open("GET", "http://localhost:3000/api/getchat", true);
+            xhttp.send();
 
         }, 3000); //3 seconds
     }
-    </script>
+
+
+    function openHQPopup() {
+        var popup = document.getElementById('hqPopup');
+        popup.style.display = 'block';
+        var steps = 8;
+        for (var i = 0; i < steps; i++) {
+            (function (idx) {
+                setTimeout(function () {
+                    document.getElementById('hqStep' + idx).style.color = '#66bb66';
+                    document.getElementById('hqStep' + idx).innerHTML = '&#10003; ' + document.getElementById('hqStep' + idx).innerText.replace('□ ', '');
+                    if (idx === steps - 1) {
+                        document.getElementById('hqDoneMsg').style.display = 'block';
+                        setTimeout(connectToHQ, 900);
+                    }
+                }, idx * 400);
+            })(i);
+        }
+    }
+    function connectToHQ() {
+        localStorage.setItem("hqConnected", "true");
+
+        document.getElementById('hqPopup').style.display = 'none';
+        for (var i = 0; i < 8; i++) { document.getElementById('hqStep' + i).style.color = '#000000'; }
+        document.getElementById('hqDoneMsg').style.display = 'none';
+        document.getElementById('hqDot').style.background = '#2a7a2a';
+        document.getElementById('hqStatusText').style.color = '#2a7a2a';
+        document.getElementById('hqStatusText').innerText = 'Connected';
+
+        var link = document.getElementById('researchDbLink');
+        link.href = 'http://localhost:3000/api/virusdatabase';
+        link.style.color = '#336699';
+        link.style.cursor = 'pointer';
+    }
+    document.addEventListener("DOMContentLoaded", function () {
+        if (localStorage.getItem("hqConnected") === "true") {
+            document.getElementById('hqDot').style.background = '#2a7a2a';
+            document.getElementById('hqStatusText').style.color = '#2a7a2a';
+            document.getElementById('hqStatusText').innerText = 'Connected';
+
+            var link = document.getElementById('researchDbLink');
+            link.href = 'http://localhost:3000/api/virusdatabase';
+            link.style.color = '#336699';
+            link.style.cursor = 'pointer';
+        }
+    });
+</script>

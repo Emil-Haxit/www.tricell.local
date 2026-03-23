@@ -11,7 +11,7 @@ const path = require('path');
 
 const pug = require('pug');
 const { response } = require('express');
-const pug_loggedinmenu = pug.compileFile('./masterframe/loggedinmenu.html');
+const pug_loggedinmenu = pug.compileFile('./masterframe/loggedinmenu.pug');
 const pug_editemployee = pug.compileFile('./masterframe/editemployee.html');
 
 
@@ -30,7 +30,6 @@ var htmlBottom = readHTML('./masterframe/bottom.html');
 
 var htmlLoggedinMenuCSS = readHTML('./masterframe/loggedinmenu_css.html');
 var htmlLoggedinMenuJS = readHTML('./masterframe/loggedinmenu_js.html');
-var htmlLoggedinMenu = readHTML('./masterframe/loggedinmenu.html');
 var htmlVirusimagesCSS = readHTML('./masterframe/virusimages_css.html');
 
 router.get('/deletevirusimage/:virusId/:imageNumber', function (request, response) {
@@ -49,6 +48,7 @@ router.get('/deletevirusimage/:virusId/:imageNumber', function (request, respons
                 name: request.cookies.name,
                 logintimes: request.cookies.logintimes,
                 lastlogin: request.cookies.lastlogin,
+                securityAccessLevel: request.session.securityAccessLevel
             }));
         }
         response.write(htmlHeader);
@@ -116,6 +116,7 @@ router.post('/newvirusimage/:id', function (request, response) {
                         name: request.cookies.name,
                         logintimes: request.cookies.logintimes,
                         lastlogin: request.cookies.lastlogin,
+                        securityAccessLevel: request.session.securityAccessLevel
                     }));
                 }
                 response.write(htmlHeader);
