@@ -66,6 +66,42 @@
     table(border="0" cellspacing="0" cellpadding="0")
         tr
             td(height="1" width="150" bgcolor="#003366")
+    // -----------------------------------------
+    // PANIC BUTTON (A only)
+    // -----------------------------------------
+    if securityAccessLevel === 'A'
+        .loggedinbutton
+            a(href="javascript:void(0)" onClick="showPanicLayer()" style="color:#cc0000;text-decoration:none;") Panic Button
+
+        table(border="0" cellspacing="0" cellpadding="0")
+            tr
+                td(height="1" width="150" bgcolor="#003366")
+
+        #panicLayer(style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:200;background:#ffffff;border:2px solid #003366;width:360px;padding:24px;box-shadow:0 4px 20px rgba(0,0,0,0.3);font-family:monospace;")
+            h2(style="margin-top:0;font-size:18px;color:#000;") VARNING!
+            p(style="margin:0 0 5px 0;font-size:14px;color:#333;") This will delete all research material.
+            p(style="margin:0 0 20px 0;font-size:14px;color:#333;") This operation is un-reversable.
+
+            p(style="margin:0 0 10px 0;font-size:14px;color:#333;") To proceed enter Panic Code:
+
+            div(style="display:flex;align-items:center;justify-content:center;margin-bottom:25px;")
+                label(for="paniccode" style="margin-right:10px;font-size:14px;color:#333;") Code:
+                input(type="password" id="paniccode" style="width:150px;padding:4px;border:1px solid #000;box-sizing:border-box;")
+
+            div(style="text-align:center;")
+                button.panicbutton(onClick="submitPanic()") Panic
+                button.panicbutton(onClick="showPanicLayer()") Cancel
+
+            #panicresult
+
+        table(border="0" cellspacing="0" cellpadding="0")
+            tr
+                td(height="1" width="150" bgcolor="#003366")
+
+    // -----------------------------------------
+    // LOGOUT BUTTON
+    // -----------------------------------------
+
     .loggedinbutton
         a(href="http://localhost:3000/api/logout" style="color:#336699;text-decoration:none;") Log out
     table(border="0" cellspacing="0" cellpadding="0")

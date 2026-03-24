@@ -1,59 +1,58 @@
 <style type="text/css">
-    #loggedinMenuLayer
-    {
+    #loggedinMenuLayer {
         position: fixed;
         top: 0%;
         left: 880px;
         z-index: 11;
         background-color: #dae3f3;
         width: 150px;
-            height: 100%;
+        height: 100%;
         padding: 10px;
         border: #000000 1px dashed;
         display: block;
     }
-    #userinfo
-    {
+
+    #userinfo {
         border: #000000 1px solid;
         background-color: #e2f0d9;
         padding: 5px;
-        font-family : Arial, Verdana, Geneva, Helvetica, sans-serif;
+        font-family: Arial, Verdana, Geneva, Helvetica, sans-serif;
         font-size: 10px;
         color: #000000;
     }
-    #chatbutton
-    {
+
+    #chatbutton {
         border: #000000 1px solid;
         background-color: #336699;
         padding: 5px;
         margin-top: 10px;
-        font-family : Arial, Verdana, Geneva, Helvetica, sans-serif;
+        font-family: Arial, Verdana, Geneva, Helvetica, sans-serif;
         font-size: 12px;
         font-weight: bold;
         text-align: center;
         color: #ffffff;
     }
-    #topsecret
-    {
+
+    #topsecret {
         margin-top: 10px;
         margin-bottom: 10px;
         width: 150px;
-        font-family : Arial, Verdana, Geneva, Helvetica, sans-serif;
+        font-family: Arial, Verdana, Geneva, Helvetica, sans-serif;
         font-size: 13px;
         text-align: center;
         color: #cc0000;
     }
-    .loggedinbutton
-    {
+
+    .loggedinbutton {
         padding: 10px;
-        font-family : Arial, Verdana, Geneva, Helvetica, sans-serif;
+        font-family: Arial, Verdana, Geneva, Helvetica, sans-serif;
         font-size: 12px;
         font-weight: bold;
         text-align: left;
         color: #336699;
     }
-    #calcLayer 
-    {
+
+    #calcLayer {
         position: fixed;
         top: 50%;
         left: 50%;
@@ -64,47 +63,47 @@
         padding: 10px;
         display: none;
     }
-    #calculator
-    {
+
+    #calculator {
         border-collapse: collapse;
         border: 1px solid black;
-        border-spacing: 0px; 
+        border-spacing: 0px;
         background-color: #cccccc;
     }
-    .calcbutton
-    {
+
+    .calcbutton {
         border-collapse: collapse;
         border: 1px solid black;
-        border-spacing: 0px; 
+        border-spacing: 0px;
         padding: 5px;
         background-color: #999999;
-        font-family : Arial, Verdana, Geneva, Helvetica, sans-serif;
+        font-family: Arial, Verdana, Geneva, Helvetica, sans-serif;
         font-size: 12px;
         color: #000000;
         width: 30px;
         height: 30px;
     }
-    .calcdisplay
-    {
+
+    .calcdisplay {
         border-collapse: collapse;
         border: 1px solid black;
-        border-spacing: 0px; 
+        border-spacing: 0px;
         padding: 5px;
         background-color: #eeeeee;
-        font-family : Arial, Verdana, Geneva, Helvetica, sans-serif;
+        font-family: Arial, Verdana, Geneva, Helvetica, sans-serif;
         font-size: 12px;
         color: #000000;
         width: 140px;
         height: 30px;
     }
-    td.calccell
-    {
+
+    td.calccell {
         text-align: center;
         vertical-align: middle;
         padding: 3px;
     }
-    #chatLayer
-    {
+
+    #chatLayer {
         position: fixed;
         top: 115;
         left: 830;
@@ -114,10 +113,48 @@
         width: 250px;
         height: 405px;
         padding: 10px;
-        overflow:scroll;
-        overflow-x:hidden;
-        overflow-y:scroll;
+        overflow: scroll;
+        overflow-x: hidden;
+        overflow-y: scroll;
         display: none;
     }
-    </style>
-    
+
+    #panicLayer {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 30;
+        background-color: #f2dede;
+        width: 300px;
+        padding: 15px;
+        border: 2px solid #990000;
+        display: none;
+        font-family: Arial, Verdana, Geneva, Helvetica, sans-serif;
+        color: #000000;
+    }
+
+    #panicLayer input[type=password] {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 6px;
+        border: 1px solid #000000;
+        background-color: #ffffff;
+        font-size: 14px;
+    }
+
+    .panicbutton {
+        background-color: #cccccc;
+        border: 1px solid #000000;
+        padding: 6px 10px;
+        font-size: 12px;
+        cursor: pointer;
+    }
+
+    #panicresult {
+        margin-top: 10px;
+        font-size: 12px;
+        font-weight: bold;
+        color: #990000;
+    }
+</style>
