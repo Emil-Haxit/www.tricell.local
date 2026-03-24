@@ -93,7 +93,6 @@
         }
     }
     function connectToHQ() {
-        localStorage.setItem("hqConnected", "true");
 
         document.getElementById('hqPopup').style.display = 'none';
         for (var i = 0; i < 8; i++) { document.getElementById('hqStep' + i).style.color = '#000000'; }
@@ -102,10 +101,24 @@
         document.getElementById('hqStatusText').style.color = '#2a7a2a';
         document.getElementById('hqStatusText').innerText = 'Connected';
 
+
+        localStorage.setItem("hqConnected", "true");
         var link = document.getElementById('researchDbLink');
         link.href = 'http://localhost:3000/api/virusdatabase';
         link.style.color = '#336699';
         link.style.cursor = 'pointer';
+
+
+        // Change button to "Disconnect HQ"
+        const btn = document.getElementById('hqConnectButton');
+        btn.innerText = "Disconnect HQ";
+        btn.onclick = disconnectHQ;
+        btn.style.color = "#cc0000"; // optional: red to show danger/disconnect
+    }
+
+    function disconnectHQ() {
+        localStorage.removeItem("hqConnected");
+        location.reload();
     }
     document.addEventListener("DOMContentLoaded", function () {
         if (localStorage.getItem("hqConnected") === "true") {
@@ -117,6 +130,13 @@
             link.href = 'http://localhost:3000/api/virusdatabase';
             link.style.color = '#336699';
             link.style.cursor = 'pointer';
+
+
+            // Change button to "Disconnect HQ"
+            const btn = document.getElementById('hqConnectButton');
+            btn.innerText = "Disconnect HQ";
+            btn.onclick = disconnectHQ;
+            btn.style.color = "#cc0000"; // optional: red to show danger/disconnect
         }
     });
 </script>

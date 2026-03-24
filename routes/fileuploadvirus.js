@@ -4,10 +4,23 @@ const multer = require('multer');
 router.use(express.json());
 const path = require('path');
 
+
+const pug = require('pug');
+const pug_loggedinmenu = pug.compileFile('./masterframe/loggedinmenu.pug');
+
+// html
+const readHTML = require('../readHTML.js');
+var htmlHead = readHTML('./masterframe/head.html');
+var htmlHeader = readHTML('./masterframe/header.html');
+var htmlMenu = readHTML('./masterframe/menu.html');
+var htmlInfoStart = readHTML('./masterframe/infoStart.html');
+var htmlInfoStop = readHTML('./masterframe/infoStop.html');
+var htmlFooter = readHTML('./masterframe/footer.html');
+var htmlBottom = readHTML('./masterframe/bottom.html');
+
 const checkAuth = require('../authMiddleware.js');
 
 router.use(express.static('./public'));
-const readHTML = require('../readHTML.js');
 const fs = require('fs');
 const { request } = require('http');
 
@@ -50,8 +63,8 @@ router.post('/:id', upload.single('fileadd'), function (request, response) {
 router.get('/:id', checkAuth, (request, response) => {
     const currentUserId = request.session.userId || null
     const idForFile = request.params.id
-    console.log(idForFile)
-    const newdata = `<style>
+    const newdata = `
+    <style>
     #fileadd {
         width: 65px;
         border: none;
@@ -73,15 +86,28 @@ router.get('/:id', checkAuth, (request, response) => {
     </form>
 </div>`
 
-    response.render('user', {
-        content: newdata,
-        userId: currentUserId,
-        cookieemployeecode: request.cookies.employeecode,
-        cookiename: request.cookies.name,
-        cookielogintimes: request.cookies.logintimes,
-        cookielastlogin: request.cookies.lastlogin,
-        menu: readHTML('./masterframe/menu_back.html'),
-    })
+    response.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+    response.write(htmlHead);
+    if (request.session.loggedin) {
+        htmlLoggedinMenuCSS = readHTML('./masterframe/loggedinmenu_css.html');
+        response.write(htmlLoggedinMenuCSS);
+        htmlLoggedinMenuJS = readHTML('./masterframe/loggedinmenu_js.html');
+        response.write(htmlLoggedinMenuJS);
+        //htmlLoggedinMenu = readHTML('./masterframe/loggedinmenu.html');
+        //response.write(htmlLoggedinMenu);
+        response.write(pug_loggedinmenu({
+            employeecode: request.cookies.employeecode,
+            name: request.cookies.name,
+            logintimes: request.cookies.logintimes,
+            lastlogin: request.cookies.lastlogin,
+            securityAccessLevel: request.session.securityAccessLevel
+        }));
+    }
+    response.write(htmlHeader);
+    response.write(htmlMenu);
+    response.write(htmlInfoStart);
+    response.write(newdata);
+    response.end();
 });
 
 module.exports = router;

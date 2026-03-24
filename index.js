@@ -72,6 +72,8 @@ const entries = require('./routes/entries.js');
 const fileUploadRouter = require('./routes/fileuploadvirus.js');
 const editVirusImage = require('./routes/editvirusimage.js');
 const activityLog = require('./routes/activityLog.js');
+const userdatabase = require('./routes/userdatabase.js');
+const livestream = require('./routes/livestream.js');
 
 
 /* -------------- Skapa default-router (om ingen under-sökväg anges av användaren) --------------------- */
@@ -126,6 +128,8 @@ app.use('/api/entries', entries);
 app.use('/api/data', fileUploadRouter);
 app.use('/api/editvirusimage', editVirusImage);
 app.use('/api/activitylog', activityLog);
+app.use('/api/userdatabase', userdatabase);
+app.use('/api/livestream', livestream);
 
 
 /* ---------------------------------- Starta webbservern ------------------------------ */

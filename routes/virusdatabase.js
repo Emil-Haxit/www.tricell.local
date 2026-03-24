@@ -221,6 +221,37 @@ router.get('/:id', function (request, response) {
 
     let level = request.session.securityAccessLevel ? request.session.securityAccessLevel.toString().trim().toUpperCase() : "";
     async function sqlQuery() {
+
+        // Attachments
+        const dirPath = path.join(__dirname, '..', 'data', virusID, 'attachments');
+
+        let attachmentsHTML = '';
+
+        if (fs.existsSync(dirPath)) {
+            const files = fs.readdirSync(dirPath);
+
+            attachmentsHTML = files.map(file => {
+                const fullPath = path.join(dirPath, file);
+                const stats = fs.statSync(fullPath);
+                const timestamp = parseInt(file.split('-')[0], 10);
+                return `
+      <div class="source_row">
+        <span class="source_value">${file}</span>
+        <span class="source_size">${(stats.size / 1024).toFixed(1)} KB</span>
+        <span class="source_date">${(new Date(timestamp).toLocaleString())}</span>
+        <div class="source_icons">
+          <form method="POST" action="/api/virusdatabase/${virusID}/delete-file" style="display:inline;">
+      <input type="hidden" name="fileName" value="${file}">
+      <button type="submit">🗑️</button>
+    </form>
+        </div>
+      </div>
+    `;
+            }).join('');
+        } else {
+            attachmentsHTML = `<div class="source_row">Inga filer</div>`;
+        }
+
         response.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
         response.write(htmlHead);
         if (request.session.loggedin) {
@@ -350,6 +381,17 @@ router.get('/:id', function (request, response) {
             };
 
             response.write(htmlOutput); // Skriv ut 
+
+            // Attachments
+            response.write(`
+                <div class="addNewFile">
+                    <p>Upload new file</p>
+                    <span class="icon_add_file"><a href="/api/data/${virusID}">📝</a></span>
+                </div>
+                <span class="source_label">Attachment:</span>
+                <div id="sources_container">
+                ${attachmentsHTML}
+                </div>`);
             response.write(entriesCSS);
             response.write(entrieJS);
             response.write(entriesHTML);
@@ -367,7 +409,6 @@ router.get('/:id', function (request, response) {
 });
 
 
-// --------------------- Läs en virus efter backup-----------------------------
 router.get('/backup/:id', function (request, response) {
     var virusID = request.params.id;
 
@@ -375,7 +416,39 @@ router.get('/backup/:id', function (request, response) {
     const ADODB = require('node-adodb');
     const connection = ADODB.open('Provider=Microsoft.Jet.OLEDB.4.0;Data Source=./data/mdb/researchdata.mdb;');
 
+    let level = request.session.securityAccessLevel ? request.session.securityAccessLevel.toString().trim().toUpperCase() : "";
     async function sqlQuery() {
+
+        // Attachments
+        const dirPath = path.join(__dirname, '..', 'data', virusID, 'attachments');
+
+        let attachmentsHTML = '';
+
+        if (fs.existsSync(dirPath)) {
+            const files = fs.readdirSync(dirPath);
+
+            attachmentsHTML = files.map(file => {
+                const fullPath = path.join(dirPath, file);
+                const stats = fs.statSync(fullPath);
+                const timestamp = parseInt(file.split('-')[0], 10);
+                return `
+      <div class="source_row">
+        <span class="source_value">${file}</span>
+        <span class="source_size">${(stats.size / 1024).toFixed(1)} KB</span>
+        <span class="source_date">${(new Date(timestamp).toLocaleString())}</span>
+        <div class="source_icons">
+          <form method="POST" action="/api/virusdatabase/${virusID}/delete-file" style="display:inline;">
+      <input type="hidden" name="fileName" value="${file}">
+      <button type="submit">🗑️</button>
+    </form>
+        </div>
+      </div>
+    `;
+            }).join('');
+        } else {
+            attachmentsHTML = `<div class="source_row">Inga filer</div>`;
+        }
+
         response.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
         response.write(htmlHead);
         if (request.session.loggedin) {
@@ -395,6 +468,7 @@ router.get('/backup/:id', function (request, response) {
         }
         response.write(htmlHeader);
         response.write(htmlMenu);
+        response.write(htmlVirusImagesCSS);
         response.write(htmlInfoStart);
 
 
@@ -417,6 +491,12 @@ router.get('/backup/:id', function (request, response) {
             if (result[0]['securityVideoLink']) {
                 str_securityVideoLink = result[0]['securityVideoLink'];
             }
+
+            const btnText = (str_objectStatus === 'open') ? 'Archive Object' : 'Open Object';
+
+            let toggleUrl = (level === 'A')
+                ? `/api/virusdatabase/toggle/${str_virusID}`
+                : `javascript:alert('Access denied. Incorrect permissions.');`;
 
             // Security file
             const filePath = path.resolve(__dirname, "../data/safetydatasheets/" + str_objectNumber + ".pdf");
@@ -449,13 +529,13 @@ router.get('/backup/:id', function (request, response) {
             if (fs.existsSync(filePath)) {
                 try {
                     const stats = fs.statSync(filePath);
-                    virusFileName = path.basename(filePath);
-                    virusFileSizeKB = Math.round(stats.size / 1024) + 'kb';
+                    const virusFileName = path.basename(filePath);
+                    const virusFileSizeKB = Math.round(stats.size / 1024) + 'kb';
                     const mtime = stats.mtime;
                     const day = String(mtime.getDate()).padStart(2, '0');
                     const month = String(mtime.getMonth() + 1).padStart(2, '0');
                     const year = mtime.getFullYear();
-                    virusLastModified = `${day}.${month}.${year}`;
+                    const virusLastModified = `${day}.${month}.${year}`;
 
                     htmlOutput += `
             <span>${virusFileName}</span>
@@ -484,6 +564,10 @@ router.get('/backup/:id', function (request, response) {
                                font-size:12px; font-weight:bold; cursor:pointer;">
                     Edit info
                 </button></a>
+            <a href="${toggleUrl}" class='edit-btn'><button style="margin-top:10px; padding:6px 14px; background:#4682B4;
+                 color:#000;
+                               border:1px solid #000; border-radius:0;
+                               font-size:12px; font-weight:bold; cursor:pointer;">${btnText}</button></a>
                 <button style="margin-top:10px; padding:6px 14px; background:#4682B4;
                  color:#000; border:1px solid #000; border-radius:0; font-size:12px; font-weight:bold; cursor:pointer;">`
                 if (await backupVirus(result)) {
@@ -496,9 +580,21 @@ router.get('/backup/:id', function (request, response) {
 
             response.write(htmlOutput); // Skriv ut 
 
+            // Attachments
+            response.write(`
+                <div class="addNewFile">
+                    <p>Upload new file</p>
+                    <span class="icon_add_file"><a href="/api/data/${virusID}">📝</a></span>
+                </div>
+                <span class="source_label">Attachment:</span>
+                <div id="sources_container">
+                ${attachmentsHTML}
+                </div>`);
             response.write(entriesCSS);
             response.write(entrieJS);
             response.write(entriesHTML);
+
+            response.write(getVirusImagesHTML(virusID));
         } else {
             response.write("<h2>You are not logged in</h2>\n");
         }
@@ -509,4 +605,5 @@ router.get('/backup/:id', function (request, response) {
     }
     sqlQuery();
 });
+
 module.exports = router;

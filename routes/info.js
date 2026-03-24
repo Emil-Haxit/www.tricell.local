@@ -6,32 +6,39 @@ router.use(express.static('./public'));
 const path = require('path');
 
 
+const pug = require('pug');
+const pug_loggedinmenu = pug.compileFile('./masterframe/loggedinmenu.pug');
 // --------------------- Läs in Masterframen --------------------------------------------------
 const readHTML = require('../readHTML.js');
 const fs = require('fs');
 
-    var htmlHead = readHTML('./masterframe/head.html');
-    var htmlHeader = readHTML('./masterframe/header.html');
-    var htmlMenu = readHTML('./masterframe/menu.html');    
-    var htmlInfoStart = readHTML('./masterframe/infoStart.html');
-    var htmlInfoStop = readHTML('./masterframe/infoStop.html');
-    var htmlFooter = readHTML('./masterframe/footer.html');
-    var htmlBottom = readHTML('./masterframe/bottom.html');
+var htmlHead = readHTML('./masterframe/head.html');
+var htmlHeader = readHTML('./masterframe/header.html');
+var htmlMenu = readHTML('./masterframe/menu.html');
+var htmlInfoStart = readHTML('./masterframe/infoStart.html');
+var htmlInfoStop = readHTML('./masterframe/infoStop.html');
+var htmlFooter = readHTML('./masterframe/footer.html');
+var htmlBottom = readHTML('./masterframe/bottom.html');
 
 
 // --------------------- Default-sida (om ingen info-sida anges) -------------------------------
-router.get('/', function(request, response)
-{
-    response.setHeader('Content-type','text/html');
+router.get('/', function (request, response) {
+    response.setHeader('Content-type', 'text/html');
     response.write(htmlHead);
-    if(request.session.loggedin)
-    {
+    if (request.session.loggedin) {
         htmlLoggedinMenuCSS = readHTML('./masterframe/loggedinmenu_css.html');
         response.write(htmlLoggedinMenuCSS);
         htmlLoggedinMenuJS = readHTML('./masterframe/loggedinmenu_js.html');
         response.write(htmlLoggedinMenuJS);
-        htmlLoggedinMenu = readHTML('./masterframe/loggedinmenu.html');
-        response.write(htmlLoggedinMenu);
+        //htmlLoggedinMenu = readHTML('./masterframe/loggedinmenu.html');
+        //response.write(htmlLoggedinMenu);
+        response.write(pug_loggedinmenu({
+            employeecode: request.cookies.employeecode,
+            name: request.cookies.name,
+            logintimes: request.cookies.logintimes,
+            lastlogin: request.cookies.lastlogin,
+            securityAccessLevel: request.session.securityAccessLevel
+        }));
     }
     response.write(htmlHeader);
     response.write(htmlMenu);
@@ -47,21 +54,26 @@ router.get('/', function(request, response)
 });
 
 // --------------------- Läs en specifik info-sida -----------------------------------------------
-router.get('/:infotext', function(request, response)
-{
+router.get('/:infotext', function (request, response) {
     const infotext = request.params.infotext;
-    
-    response.setHeader('Content-type','text/html');
+
+    response.setHeader('Content-type', 'text/html');
     response.write(htmlHead);
 
-    if(request.session.loggedin)
-    {
+    if (request.session.loggedin) {
         htmlLoggedinMenuCSS = readHTML('./masterframe/loggedinmenu_css.html');
         response.write(htmlLoggedinMenuCSS);
         htmlLoggedinMenuJS = readHTML('./masterframe/loggedinmenu_js.html');
         response.write(htmlLoggedinMenuJS);
-        htmlLoggedinMenu = readHTML('./masterframe/loggedinmenu.html');
-        response.write(htmlLoggedinMenu);
+        //htmlLoggedinMenu = readHTML('./masterframe/loggedinmenu.html');
+        //response.write(htmlLoggedinMenu);
+        response.write(pug_loggedinmenu({
+            employeecode: request.cookies.employeecode,
+            name: request.cookies.name,
+            logintimes: request.cookies.logintimes,
+            lastlogin: request.cookies.lastlogin,
+            securityAccessLevel: request.session.securityAccessLevel
+        }));
     }
 
     response.write(htmlHeader);
@@ -69,16 +81,14 @@ router.get('/:infotext', function(request, response)
     response.write(htmlInfoStart);
 
     // Kollar om inskickade sidan existerar, annars läs default 
-    const filepath = path.resolve(__dirname, "../public/text/"+infotext+'.html');
-    if (fs.existsSync(filepath)) 
-    { 
-        htmlInfo = readHTML('./public/text/'+infotext+'.html');      
+    const filepath = path.resolve(__dirname, "../public/text/" + infotext + '.html');
+    if (fs.existsSync(filepath)) {
+        htmlInfo = readHTML('./public/text/' + infotext + '.html');
     }
-    else
-    {
+    else {
         htmlInfo = readHTML('./public/text/index.html');
     }
-    response.write(htmlInfo);    
+    response.write(htmlInfo);
     response.write(htmlInfoStop);
     response.write(htmlFooter);
     response.write(htmlBottom);
