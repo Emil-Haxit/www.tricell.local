@@ -1,0 +1,68 @@
+// Menu container
+#menucontainer
+
+  // Menu item 1
+  .menuitem
+    table
+      tr
+        td.menuicon
+          img(src="images/menu_company.png" border="0")
+        td.menutext
+          a(href=`${webbadress}/api/info/company_presentation`) Company Presentation
+
+    .menudropitem
+      table
+        tr
+          td.menudroptext(colspan="2")
+            a(href=`${webbadress}/api/info/pharmaceutical_research`) 1. Pharmaceutical Research
+        tr
+          td.menudroptext(colspan="2")
+            a(href=`${webbadress}/api/info/natural_resources`) 2. Natural Resources
+        tr
+          td.menudroptext(colspan="2")
+            a(href=`${webbadress}/api/info/shipping`) 3. Shipping
+
+  // Menu item 2
+  .menuitem
+    table
+      tr
+        td.menuicon
+          img(src="images/menu_history.png" border="0")
+        td.menutext
+          a(href=`${webbadress}/api/info/history`) History
+
+  // Menu item 3
+  .menuitem
+    table
+      tr
+        td.menuicon
+          img(src="images/menu_board.png" border="0")
+        td.menutext
+          a(href=`${webbadress}/api/info/headquarters`) Headquarters
+
+    .menudropitem
+      table
+        tr
+          td.menudroptext(colspan="2")
+            a(href=`${webbadress}/api/info/board_of_directors`) Board of Directors
+        tr
+          td.menudroptext(colspan="2")
+            a(href=`${webbadress}/api/info/international_suppliers`) International Suppliers
+        tr
+          td.menudroptext(colspan="2")
+            a(href=`${webbadress}/api/info/kijuju_laboratory`) Kijuju Laboratory
+        tr
+          td.menudroptext(colspan="2")
+            a(href=`${webbadress}/api/info/mariehamn_data_lab`) Mariehamn Data Lab
+
+  // Menu item 4
+  .menuitem
+    table
+      tr
+        td.menuicon
+          img(src="images/menu_personnel.png" border="0")
+        td.menutext
+          a(href=`${webbadress}/api/personnelregistry`) Personnel Registry
+
+// Clear float
+div(style="height:0px;clear:both;")

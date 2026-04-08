@@ -9,6 +9,22 @@ const readHTML = require('../readHTML.js');
 const pug = require('pug');
 const pug_loggedinmenu = pug.compileFile('./masterframe/loggedinmenu.pug');
 
+
+/* Läs respektive HTML-text-sida för Masterframen */
+const renderHead = pug.compileFile('./masterframe/head.pug');
+
+// Pass variables here:
+const htmlHead = renderHead({
+    webbadress: globalConfig.webbadress
+});
+var htmlHeader = readHTML('./masterframe/header.html');
+const renderMenu = pug.compileFile('./masterframe/menu.pug');
+
+// Pass variables here:
+const htmlMenu = renderMenu({
+    webbadress: globalConfig.webbadress
+});
+
 // Hjälpfunktion för att hämta XML-värden
 function getXmlValue(xml, parentTag, childTag) {
     const parentMatch = xml.match(new RegExp(`<${parentTag}>([\\s\\S]*?)</${parentTag}>`));
@@ -85,7 +101,7 @@ router.get('/', async (request, response) => {
     }
 
     // Skicka HTML-delar
-    response.write(readHTML('./masterframe/head.html'));
+    response.write(htmlHead);
     response.write(readHTML('./masterframe/loggedinmenu_css.html'));
     response.write(readHTML('./masterframe/loggedinmenu_js.html'));
     // Rendera menyn med Pug och skicka med användardata från cookies
@@ -99,8 +115,8 @@ router.get('/', async (request, response) => {
             webbadress: globalConfig.webbadress
         }));
     }
-    response.write(readHTML('./masterframe/header.html'));
-    response.write(readHTML('./masterframe/menu.html'));
+    response.write(htmlHeader);
+    response.write(htmlMenu);
     response.write(readHTML('./masterframe/infostart.html'));
 
     let htmloutput = `

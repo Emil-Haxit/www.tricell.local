@@ -43,14 +43,19 @@ const pug_loggedinmenu = pug.compileFile('./masterframe/loggedinmenu.pug');
 const readHTML = require('./readHTML.js');
 
 /* Läs respektive HTML-text-sida för Masterframen */
-const renderMenu = pug.compileFile('./masterframe/head.pug');
+const renderHead = pug.compileFile('./masterframe/head.pug');
 
 // Pass variables here:
-const htmlHead = renderMenu({
+const htmlHead = renderHead({
     webbadress: globalConfig.webbadress
 });
 var htmlHeader = readHTML('./masterframe/header.html');
-var htmlMenu = readHTML('./masterframe/menu.html');
+const renderMenu = pug.compileFile('./masterframe/menu.pug');
+
+// Pass variables here:
+const htmlMenu = renderMenu({
+    webbadress: globalConfig.webbadress
+});
 var htmlInfoStart = readHTML('./masterframe/infoStart.html');
 var htmlIndex = readHTML('./public/text/index.html');
 var htmlInfoStop = readHTML('./masterframe/infoStop.html');
