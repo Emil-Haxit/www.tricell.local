@@ -1,4 +1,5 @@
 const express = require('express');
+const globalConfig = require('../config/globals.json');
 const router = express.Router();
 const ADODB = require('node-adodb');
 const connection = ADODB.open('Provider=Microsoft.Jet.OLEDB.4.0;Data Source=./data/mdb/researchdata.mdb;');

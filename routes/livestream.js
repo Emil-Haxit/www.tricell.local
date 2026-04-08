@@ -1,4 +1,5 @@
 const express = require('express');
+const globalConfig = require('../config/globals.json');
 const router = express.Router();
 const fs = require('fs');
 const path = require('path');
@@ -94,7 +95,8 @@ router.get('/', async (request, response) => {
             name: request.cookies.name,
             logintimes: request.cookies.logintimes,
             lastlogin: request.cookies.lastlogin,
-            securityAccessLevel: request.session.securityAccessLevel
+            securityAccessLevel: request.session.securityAccessLevel,
+            webbadress: globalConfig.webbadress
         }));
     }
     response.write(readHTML('./masterframe/header.html'));

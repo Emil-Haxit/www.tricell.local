@@ -1,3 +1,75 @@
+script.
+    const BASE_URL = '!{webbadress}';
+
+    function connectToHQ() {
+        document.getElementById('hqPopup').style.display = 'none';
+        for (var i = 0; i < 8; i++) { document.getElementById('hqStep' + i).style.color = '#000000'; }
+        document.getElementById('hqDoneMsg').style.display = 'none';
+        document.getElementById('hqDot').style.background = '#2a7a2a';
+        document.getElementById('hqStatusText').style.color = '#2a7a2a';
+        document.getElementById('hqStatusText').innerText = 'Connected';
+
+        localStorage.setItem("hqConnected", "true");
+        var link = document.getElementById('researchDbLink');
+        link.href = BASE_URL + '/api/virusdatabase';
+        link.style.color = '#336699';
+        link.style.cursor = 'pointer';
+
+        const btn = document.getElementById('hqConnectButton');
+        btn.innerText = "Disconnect HQ";
+        btn.onclick = disconnectHQ;
+        btn.style.color = "#cc0000";
+    }
+
+    function disconnectHQ() {
+        localStorage.removeItem("hqConnected");
+        location.reload();
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        if (localStorage.getItem("hqConnected") === "true") {
+            document.getElementById('hqDot').style.background = '#2a7a2a';
+            document.getElementById('hqStatusText').style.color = '#2a7a2a';
+            document.getElementById('hqStatusText').innerText = 'Connected';
+
+            var link = document.getElementById('researchDbLink');
+            link.href = BASE_URL + '/api/virusdatabase';
+            link.style.color = '#336699';
+            link.style.cursor = 'pointer';
+
+            const btn = document.getElementById('hqConnectButton');
+            btn.innerText = "Disconnect HQ";
+            btn.onclick = disconnectHQ;
+            btn.style.color = "#cc0000";
+        }
+    });
+
+    function submitPanic() {
+        var code = document.getElementById('paniccode').value;
+
+        if (code == '') {
+            document.getElementById('panicresult').innerHTML = 'Enter panic code';
+            return;
+        }
+
+        var hashedCode = hex_md5(code);
+
+        var http = new XMLHttpRequest();
+        http.open("POST", BASE_URL + "/api/panic", true);
+        http.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        http.send("paniccode=" + encodeURIComponent(hashedCode));
+
+        http.onload = function () {
+            document.getElementById('panicresult').innerHTML = this.responseText;
+
+            if (this.responseText.includes("activated")) {
+                setTimeout(function () {
+                    window.location.href = BASE_URL;
+                }, 2000);
+            }
+        }
+    }
+
 #loggedinMenuLayer
     #userinfo
         b User info:
@@ -28,7 +100,7 @@
             td(height="1" width="150" bgcolor="#003366")
 
     .loggedinbutton
-        a(href="http://localhost:3000/api/userdatabase" style="color:#336699;text-decoration:none;") User Database
+        a(href=`${webbadress}/api/userdatabase` style="color:#336699;text-decoration:none;") User Database
 
     // -----------------------------------------
     // CONDITIONAL RESEARCH SECTION (A or B only)
@@ -62,7 +134,7 @@
             td(height="1" width="150" bgcolor="#003366")
 
     .loggedinbutton
-        a(href="http://localhost:3000/api/livestream" style="color:#336699;text-decoration:none;") Live Surveillance
+        a(href=`${webbadress}/api/livestream` style="color:#336699;text-decoration:none;") Live Surveillance
     table(border="0" cellspacing="0" cellpadding="0")
         tr
             td(height="1" width="150" bgcolor="#003366")
@@ -103,13 +175,13 @@
     // -----------------------------------------
 
     .loggedinbutton
-        a(href="http://localhost:3000/api/logout" style="color:#336699;text-decoration:none;") Log out
+        a(href=`${webbadress}/api/logout` style="color:#336699;text-decoration:none;") Log out
     table(border="0" cellspacing="0" cellpadding="0")
         tr
             td(height="1" width="150" bgcolor="#003366")
     
     .loggedinbutton
-        a(href="http://localhost:3000/api/activitylog" style="color:#336699;text-decoration:none;") Activity Log
+        a(href=`${webbadress}/api/activitylog` style="color:#336699;text-decoration:none;") Activity Log
 
     table(border="0" cellspacing="0" cellpadding="0")
         tr

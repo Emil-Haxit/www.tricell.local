@@ -1,4 +1,5 @@
 const express = require('express');
+const globalConfig = require('../config/globals.json');
 const router = express.Router();
 const crypto = require('crypto');
 const fs = require('fs');
@@ -11,18 +12,15 @@ router.use(express.json());
 // Sätt upp anslutningen till forskningsdatabasen
 const connection = ADODB.open('Provider=Microsoft.Jet.OLEDB.4.0;Data Source=./data/mdb/researchdata.mdb;');
 
-router.post('/', async (request, response) =>
-{
+router.post('/', async (request, response) => {
     // Kontrollera att användaren är inloggad
-    if(!request.session.loggedin)
-    {
+    if (!request.session.loggedin) {
         response.send("Not logged in");
         return;
     }
 
     // Kontrollera SecurityAccessLevel
-    if(request.session.securityAccessLevel !== 'A')
-    {
+    if (request.session.securityAccessLevel !== 'A') {
         response.send("Access denied");
         return;
     }
@@ -32,33 +30,31 @@ router.post('/', async (request, response) =>
     const correctHash = crypto.createHash('md5').update('Arias').digest('hex');
 
     // Om användaren skriver fel panic code
-    if(paniccode !== correctHash)
-    {
+    if (paniccode !== correctHash) {
         response.send("Wrong panic code");
         return;
     }
 
-    try
-    {
+    try {
         // Logga att panik-knappen har aktiverats på användarens dator
         const logPath = path.resolve(__dirname, '../data/panic.log');
         const logRow = new Date().toISOString() + " | PANIC ACTIVATED BY " + request.session.username + "\n";
         fs.appendFileSync(logPath, logRow);
 
         // ====================================================================
-                        // BEVISFÖRSTÖRELSE STARTAR HÄR
+        // BEVISFÖRSTÖRELSE STARTAR HÄR
         // ====================================================================
 
         // Töm tabellerna i databasen
         await connection.execute('DELETE FROM ResearchObjects');
-        
-        await connection.execute('DELETE FROM ResearchEntries'); 
+
+        await connection.execute('DELETE FROM ResearchEntries');
         console.log("Tabellerna ResearchObjects och ResearchEntries har tömts.");
 
         // Ta bort virusdatabase.js från index.js så att appen inte kraschar efter panic har körts
         const indexPath = path.resolve(__dirname, '../index.js'); // Leta upp index.js i rotmappen
         if (fs.existsSync(indexPath)) {
-            
+
             let indexContent = fs.readFileSync(indexPath, 'utf8');
 
             indexContent = indexContent.replace("const virusdatabase = require('./routes/virusdatabase');", "// borttagen route");
@@ -84,10 +80,10 @@ router.post('/', async (request, response) =>
             if (fs.existsSync(dir)) {
                 // Använder rmSync för att radera hela mappen och allt innehåll direkt
                 fs.rmSync(dir, { recursive: true, force: true });
-                
+
                 // Skapa en ny, tom mapp med samma namn efteråt så att servern inte kraschar om någon annan del av koden letar efter mappen
                 fs.mkdirSync(dir);
-                
+
                 console.log(`Mappen ${dir} har utplånats och återskapats tom.`);
             }
         }
@@ -96,8 +92,7 @@ router.post('/', async (request, response) =>
         response.send("<span style='color:red; font-weight:bold;'>Panic sequence activated. All research data, routing and files have been purged.</span>");
     }
     // Annars:
-    catch(err)
-    {
+    catch (err) {
         console.error("Ett fel uppstod vid radering av bevismaterial: ", err);
         response.send("Panic failed");
     }

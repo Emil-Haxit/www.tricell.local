@@ -1,4 +1,5 @@
 const express = require('express');
+const globalConfig = require('../config/globals.json');
 const router = express.Router();
 const bodyParser = require('body-parser');
 var formidable = require('formidable');
@@ -20,7 +21,12 @@ const pug_editVirus = pug.compileFile('./masterframe/newVirus.pug');
 const readHTML = require('../readHTML.js');
 const fs = require('fs');
 
-var htmlHead = readHTML('./masterframe/head.html');
+const renderMenu = pug.compileFile('./masterframe/head.pug');
+
+// Pass variables here:
+const htmlHead = renderMenu({
+    webbadress: globalConfig.webbadress
+});
 var htmlHeader = readHTML('./masterframe/header.html');
 var htmlMenu = readHTML('./masterframe/menu.html');
 var htmlInfoStart = readHTML('./masterframe/infoStart.html');
@@ -77,7 +83,8 @@ router.post('/', function (request, response) {
                         name: request.cookies.name,
                         logintimes: request.cookies.logintimes,
                         lastlogin: request.cookies.lastlogin,
-                        securityAccessLevel: request.session.securityAccessLevel
+                        securityAccessLevel: request.session.securityAccessLevel,
+                        webbadress: globalConfig.webbadress
                     }));
                 }
                 response.write(htmlLoggedinMenu);
@@ -101,7 +108,7 @@ router.post('/', function (request, response) {
                     }
 
                     // Ge respons till användaren
-                    response.write("virus added<br/><p /><a href=\"http://localhost:3000/api/virusdatabase\" style=\"color:#336699;text-decoration:none;\">Go back</a>");
+                    response.write("virus added<br/><p /><a href=\"" + globalConfig.webbadress + "/api/virusdatabase\" style=\"color:#336699;text-decoration:none;\">Go back</a>");
                 } else {
                     response.write("Not logged in or insufficient security access level");
                 }
@@ -149,7 +156,8 @@ router.get('/', (request, response) => {
                 name: request.cookies.name,
                 logintimes: request.cookies.logintimes,
                 lastlogin: request.cookies.lastlogin,
-                securityAccessLevel: request.session.securityAccessLevel
+                securityAccessLevel: request.session.securityAccessLevel,
+                webbadress: globalConfig.webbadress
             }));
         }
         response.write(htmlHeader);
@@ -163,6 +171,7 @@ router.get('/', (request, response) => {
             htmlNewEmployeeJS = readHTML('./masterframe/newemployee_js.html');
             response.write(htmlNewEmployeeJS);
             response.write(pug_editVirus({
+                webbadress: globalConfig.webbadress
             }));
         }
         else {

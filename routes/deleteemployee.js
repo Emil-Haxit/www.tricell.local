@@ -1,4 +1,5 @@
 const express = require('express');
+const globalConfig = require('../config/globals.json');
 const router = express.Router();
 
 router.use(express.static('./public'));
@@ -11,7 +12,12 @@ const { response } = require('express'); const pug_loggedinmenu = pug.compileFil
 const readHTML = require('../readHTML.js');
 const fs = require('fs');
 
-var htmlHead = readHTML('./masterframe/head.html');
+const renderMenu = pug.compileFile('./masterframe/head.pug');
+
+// Pass variables here:
+const htmlHead = renderMenu({
+    webbadress: globalConfig.webbadress
+});
 var htmlHeader = readHTML('./masterframe/header.html');
 var htmlMenu = readHTML('./masterframe/menu.html');
 var htmlInfoStart = readHTML('./masterframe/infoStart.html');

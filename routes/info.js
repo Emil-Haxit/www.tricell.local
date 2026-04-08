@@ -1,4 +1,5 @@
 const express = require('express');
+const globalConfig = require('../config/globals.json');
 const router = express.Router();
 router.use(express.json());
 
@@ -12,7 +13,12 @@ const pug_loggedinmenu = pug.compileFile('./masterframe/loggedinmenu.pug');
 const readHTML = require('../readHTML.js');
 const fs = require('fs');
 
-var htmlHead = readHTML('./masterframe/head.html');
+const renderMenu = pug.compileFile('./masterframe/head.pug');
+
+// Pass variables here:
+const htmlHead = renderMenu({
+    webbadress: globalConfig.webbadress
+});
 var htmlHeader = readHTML('./masterframe/header.html');
 var htmlMenu = readHTML('./masterframe/menu.html');
 var htmlInfoStart = readHTML('./masterframe/infoStart.html');
@@ -37,7 +43,8 @@ router.get('/', function (request, response) {
             name: request.cookies.name,
             logintimes: request.cookies.logintimes,
             lastlogin: request.cookies.lastlogin,
-            securityAccessLevel: request.session.securityAccessLevel
+            securityAccessLevel: request.session.securityAccessLevel,
+            webbadress: globalConfig.webbadress
         }));
     }
     response.write(htmlHeader);
@@ -72,7 +79,8 @@ router.get('/:infotext', function (request, response) {
             name: request.cookies.name,
             logintimes: request.cookies.logintimes,
             lastlogin: request.cookies.lastlogin,
-            securityAccessLevel: request.session.securityAccessLevel
+            securityAccessLevel: request.session.securityAccessLevel,
+            webbadress: globalConfig.webbadress
         }));
     }
 

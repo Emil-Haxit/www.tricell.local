@@ -1,4 +1,5 @@
 const express = require('express');
+const globalConfig = require('../config/globals.json');
 const router = express.Router();
 const bodyParser = require('body-parser');
 var formidable = require('formidable');
@@ -21,7 +22,12 @@ const { getVirusImagesHTML } = require('./virusimages.js');
 const readHTML = require('../readHTML.js');
 const fs = require('fs');
 
-var htmlHead = readHTML('./masterframe/head.html');
+const renderMenu = pug.compileFile('./masterframe/head.pug');
+
+// Pass variables here:
+const htmlHead = renderMenu({
+    webbadress: globalConfig.webbadress
+});
 var htmlHeader = readHTML('./masterframe/header.html');
 var htmlMenu = readHTML('./masterframe/menu.html');
 var htmlInfoStart = readHTML('./masterframe/infoStart.html');
@@ -159,7 +165,8 @@ router.get('/:id', (request, response) => {
                 name: request.cookies.name,
                 logintimes: request.cookies.logintimes,
                 lastlogin: request.cookies.lastlogin,
-                securityAccessLevel: request.session.securityAccessLevel
+                securityAccessLevel: request.session.securityAccessLevel,
+                webbadress: globalConfig.webbadress
             }));
         }
         response.write(htmlHeader);

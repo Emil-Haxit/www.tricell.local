@@ -1,6 +1,6 @@
 /* ----------------------------- 3:rd party-moduler ------------------------------ */
-const config = require('./config/globals.json');
 const express = require('express');
+const globalConfig = require('./config/globals.json');
 const session = require('express-session');
 const bodyParser = require('body-parser');
 
@@ -43,7 +43,12 @@ const pug_loggedinmenu = pug.compileFile('./masterframe/loggedinmenu.pug');
 const readHTML = require('./readHTML.js');
 
 /* Läs respektive HTML-text-sida för Masterframen */
-var htmlHead = readHTML('./masterframe/head.html');
+const renderMenu = pug.compileFile('./masterframe/head.pug');
+
+// Pass variables here:
+const htmlHead = renderMenu({
+    webbadress: globalConfig.webbadress
+});
 var htmlHeader = readHTML('./masterframe/header.html');
 var htmlMenu = readHTML('./masterframe/menu.html');
 var htmlInfoStart = readHTML('./masterframe/infoStart.html');
@@ -91,12 +96,14 @@ app.get('/', function (request, response) {
         response.write(htmlLoggedinMenuJS);
         //htmlLoggedinMenu = readHTML('./masterframe/loggedinmenu.html');
         //response.write(htmlLoggedinMenu);
+        console.log("webbadress:", globalConfig.webbadress);
         response.write(pug_loggedinmenu({
             employeecode: request.cookies.employeecode,
             name: request.cookies.name,
             logintimes: request.cookies.logintimes,
             lastlogin: request.cookies.lastlogin,
-            securityAccessLevel: request.session.securityAccessLevel
+            securityAccessLevel: request.session.securityAccessLevel,
+            webbadress: globalConfig.webbadress
         }));
     }
 

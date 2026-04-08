@@ -1,0 +1,132 @@
+doctype html
+html(xmlns="http://www.w3.org/1999/xhtml" xml:lang="sv")
+  head
+    title Tricell Laboratories Inc, Åland
+    base(href="/")
+
+    script(language="JavaScript" type="text/javascript" src="scripts/leftmenu.js")
+    script(language="JavaScript" src="scripts/MD5.js")
+
+    script(language="JavaScript").
+      let keys = { t: false, r: false };
+
+      addEventListener("keydown", (event) => {
+        if (event.key === "t") keys.t = true;
+        if (event.key === "r") keys.r = true;
+        if (keys.t && keys.r) document.getElementById("loginLayer").style.display = "block";
+      });
+
+      addEventListener("keyup", (event) => {
+        if (event.key === "t") keys.t = false;
+        if (event.key === "r") keys.r = false;
+      });
+
+      document.addEventListener("keydown", event => {
+        if (event.key == "Escape") document.getElementById("loginLayer").style.display = "none";
+      });
+
+      function hashing() {
+        document.form.fpassword.value = hex_md5(document.form.fpassword.value);
+      }
+
+      function formCheck() {
+        if (document.form.femployeecode.value == "") {
+          alert("You must give an employee code!");
+          return false;
+        }
+        if (document.form.fpassword.value == "") {
+          alert("You must give a password!");
+          return false;
+        }
+      }
+
+    link(rel="stylesheet" href="css/index.css")
+    link(rel="stylesheet" href="css/leftmenu.css")
+    link(rel="stylesheet" href="css/personnel_registry.css")
+    link(rel="stylesheet" href="css/viruscss.css")
+
+    style(type="text/css").
+      #loginLayer {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 10;
+        background-color: #98e6b2;
+        width: 250px;
+        padding: 10px;
+        border: #294e13 2px dashed;
+        display: none;
+      }
+
+      input[type=text],
+      input[type=date],
+      input[type=file],
+      select,
+      textarea,
+      input[type=password] {
+        padding: 5px 5px;
+        box-sizing: border-box;
+        border: 1px solid black;
+        background-color: #d7ecff;
+        font-size: 16px;
+      }
+
+      input[type="file"] {
+        color: transparent;
+        width: 166px;
+      }
+
+      select option {
+        margin: 40px;
+        background: rgba(0, 0, 0, 0.3);
+        color: #fff;
+        font-size: 16px;
+        text-shadow: 0 1px 0 rgba(0, 0, 0, 0.4);
+      }
+
+  body(onload="loadChat()")
+
+    // LEFT MENU — FIXED INDENTATION
+    #leftsidebar.sidebar
+      a.closemenubutton(href="javascript:void(0)" onclick="closeMenu()") x
+
+      b
+        a(href=`${webbadress}/api/info/company_presentation`) Company Presentation
+
+      a(href=`${webbadress}/api/info/pharmaceutical_research`) 1. Pharmaceutical Research
+      a(href=`${webbadress}/api/info/natural_resources`) 2. Natural Resources
+      a(href=`${webbadress}/api/info/shipping`) 3. Shipping
+
+      p
+      b
+        a(href=`${webbadress}/api/info/history`) History
+
+      p
+      b
+        a(href=`${webbadress}/api/info/headquarters`) Headquarters
+
+      a(href=`${webbadress}/api/info/board_of_directors`) Board of Directors
+      a(href=`${webbadress}/api/info/international_suppliers`) International Suppliers
+      a(href=`${webbadress}/api/info/kijuju_laboratory`) Kijuju Laboratory
+      a(href=`${webbadress}/api/info/mariehamn_data_lab`) Mariehamn Data Lab
+
+      p
+      b
+        a(href=`${webbadress}/api/personnelregistry`) Personnel Registry
+
+    // LOGIN WINDOW — FIXED INDENTATION
+    #loginLayer
+      big
+        strong Login to Tricell Laboratories:
+      form(name="form" action=`${webbadress}/api/login` method="get" onSubmit="return formCheck()")
+        p
+        | Employee Code:
+        input(type="text" name="femployeecode" id="femployeecode" size="7" maxlength="7")
+        p
+        | Password:
+        input(type="password" name="fpassword" id="fpassword" size="7" maxlength="7")
+        p
+        input(type="submit" class="button" value="Login" onClick="javascript:hashing()")
+        input(type="reset" class="button" value="Reset Form")
+        p
