@@ -27,7 +27,14 @@ const renderHead = pug.compileFile('./masterframe/head.pug');
 const htmlHead = renderHead({
     webbadress: globalConfig.webbadress
 });
-var htmlHeader = readHTML('./masterframe/header.html');
+
+const renderHeader = pug.compileFile('./masterframe/header.pug');
+
+// Pass variables here:
+const htmlHeader = renderHeader({
+    webbadress: globalConfig.webbadress
+});
+
 const renderMenu = pug.compileFile('./masterframe/menu.pug');
 
 // Pass variables here:

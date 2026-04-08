@@ -1,0 +1,59 @@
+// Header start
+#menubuttoncontainer
+  button.openmenubutton(onclick="openMenu()") Sitemap
+
+#headercontainer
+
+  // Header left
+  #headerleft
+    a(href=`${webbadress}`)
+      img#headerlogo(src="images/logo.gif" alt="Tricell Laboratories" border="0")
+
+  // Header middle
+  #headermiddle
+    table
+      tr
+        td.socialicon
+          a(href="http://www.facebook.com")
+            img(src="images/social_fb.gif" alt="Facebook" border="0")
+        td.socialicon
+          a(href="http://www.instagram.com")
+            img(src="images/social_insta.gif" alt="Instagram" border="0")
+        td.socialicon
+          a(href="http://www.twitter.com")
+            img(src="images/social_twitter.gif" alt="Twitter" border="0")
+        td.socialicon
+          a(href="http://www.youtube.com")
+            img(src="images/social_youtube.gif" alt="Youtube" border="0")
+        td.socialicon
+          a(href="http://www.pinterest.com")
+            img(src="images/social_pin.gif" alt="Pinterest" border="0")
+        td.socialicon
+          a(href="http://www.snapchat.com")
+            img(src="images/social_snap.gif" alt="Snapchat" border="0")
+
+  // Header right
+  #headerright
+    table
+      tr
+        td(colspan="2" height="20" valign="top" align="center")
+          font.contactheading TRICELL LABORATORIES
+      tr
+        td.contacticon
+          img(src="images/contact_phone.gif" alt="Phone" border="0")
+        td.contactinfo +324 (555)-541 236
+      tr
+        td.contacticon
+          img(src="images/contact_fax.gif" alt="Fax" border="0")
+        td.contactinfo +324 (555)-543 626
+      tr
+        td.contacticon
+          img(src="images/contact_mail.gif" alt="Mail" border="0")
+        td.contactinfo office@tricell.com
+      tr
+        td.contacticon
+          img(src="images/contact_web.gif" alt="Web" border="0")
+        td.contactinfo www.tricell.com
+
+// Clear float
+div(style="height:0px;clear:both;")
